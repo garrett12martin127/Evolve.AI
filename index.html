@@ -3,46 +3,84 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Evolve.AI — Investor Demo</title>
+  <title>Evolve.AI — Medford Private Beta</title>
   <style>
-    :root{--bg:#f6f7fb;--card:#fff;--muted:#7b8190;--accent:#2b7cff;--accent2:#00bfa6;--radius:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#eef3ff 0%, var(--bg) 40%);color:#111827}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .brand{display:flex;gap:10px;align-items:center}
-    .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(180deg,#2b7cff,#8fb6ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
-    .muted{color:var(--muted);font-size:13px}
-    .btn{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 8px 20px rgba(43,124,255,.12)}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(43,124,255,.25);box-shadow:none}
-    .btn.alt{background:var(--accent2)}
-    nav{display:flex;gap:10px;flex-wrap:wrap}
-    nav a{padding:8px 12px;border-radius:10px;border:1px solid transparent}
-    nav a.active{border-color:rgba(43,124,255,.25);background:#fff}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
-    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(17,24,39,.06)}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .kpi{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03))}
-    .exercise{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));font-size:14px}
-    .meal{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));margin-bottom:10px}
-    details{background:#f3f6ff;border:1px solid #e3ebff;padding:8px;border-radius:10px;margin-top:6px}
-    .form label{font-size:12px;color:var(--muted)}
-    .form input,.form select{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;margin-top:6px;margin-bottom:10px}
-    @media (max-width:960px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr}}
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --muted: #8b949e;
+      --accent: #1f6feb;   /* blue */
+      --accent2: #00c2ff;  /* electric blue */
+      --text: #c9d1d9;
+      --radius: 12px;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px; }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .brand { display: flex; gap: 10px; align-items: center; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800;
+      box-shadow: 0 0 12px rgba(0,194,255,.35);
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .btn {
+      background: var(--accent); color: #fff; border: 0;
+      padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600;
+      box-shadow: 0 0 10px var(--accent2), 0 0 20px rgba(0,194,255,.25);
+      transition: all .2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.ghost {
+      background: transparent; color: var(--accent);
+      border: 1px solid rgba(0,194,255,.5);
+      box-shadow: none;
+    }
+    nav { display: flex; gap: 10px; flex-wrap: wrap; }
+    nav a { padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
+    nav a.active { border-color: var(--accent2); background: var(--card); }
+    .grid { display: grid; grid-template-columns: 1fr 360px; gap: 14px; }
+    .card {
+      background: var(--card); border-radius: 14px; padding: 16px;
+      box-shadow: 0 8px 20px rgba(0,194,255,.1);
+    }
+    .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .kpi { padding: 12px; border-radius: 12px; background: #0d1117; border: 1px solid #1f6feb33; }
+    .exercise, .meal {
+      padding: 12px; border-radius: 10px;
+      background: #0d1117; border: 1px solid #1f6feb33;
+      margin-bottom: 10px;
+    }
+    details { background: #0d1117; border: 1px solid #1f6feb33; padding: 8px; border-radius: 10px; margin-top: 6px; }
+    .form label { font-size: 12px; color: var(--muted); }
+    .form input, .form select {
+      width: 100%; padding: 10px; border: 1px solid #30363d;
+      border-radius: 10px; background: #0d1117; color: var(--text);
+      margin-top: 6px; margin-bottom: 10px;
+    }
+    @media (max-width:960px) { .grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr; } }
     /* Pricing */
-    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .plan{border:1px solid #e5e7eb;border-radius:14px;padding:16px;background:#fff}
-    .plan h3{margin:0 0 6px 0}
-    .price{font-size:28px;font-weight:800}
-    .check{color:#10b981;font-weight:700}
-    .cross{color:#ef4444;font-weight:700}
+    .plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .plan { border: 1px solid #30363d; border-radius: 14px; padding: 16px; background: #0d1117; }
+    .plan h3 { margin: 0 0 6px 0; }
+    .price { font-size: 28px; font-weight: 800; color: var(--accent2); }
+    .check { color: #10b981; font-weight: 700; }
+    .cross { color: #ef4444; font-weight: 700; }
     @media (max-width:900px){.plans{grid-template-columns:1fr}}
     /* Transformations */
-    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .tile{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px}
-    .before,.after{height:140px;border-radius:10px;background:linear-gradient(45deg,#c7d2fe,#e0e7ff);display:flex;align-items:center;justify-content:center;font-weight:700}
-    .after{background:linear-gradient(45deg,#bbf7d0,#86efac)}
+    .gallery { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .tile { background: #0d1117; border: 1px solid #1f6feb33; border-radius: 14px; padding: 12px; }
+    .before,.after {
+      height: 140px; border-radius: 10px; display:flex; align-items:center; justify-content:center;
+      font-weight: 700;
+    }
+    .before { background: linear-gradient(45deg,#222,#333); color: #999; }
+    .after { background: linear-gradient(45deg,#1f6feb,#00c2ff); color: #fff; }
   </style>
 </head>
 <body>
@@ -53,7 +91,7 @@
         <div class="logo">EA</div>
         <div>
           <div style="font-weight:800">Evolve.AI</div>
-          <div class="muted">Personalized fitness & nutrition — investor demo</div>
+          <div class="muted">Medford Private Beta · Aug 17, 2025</div>
         </div>
       </div>
       <nav>
@@ -80,8 +118,8 @@
             </div>
             <div class="kpi">
               <div class="muted">Workout Completion</div>
-              <div style="height:18px;border-radius:10px;background:#e5e7eb;overflow:hidden">
-                <div id="progressBar" style="height:18px;width:42%;background:linear-gradient(90deg,#2b7cff,#00bfa6)"></div>
+              <div style="height:18px;border-radius:10px;background:#1f2937;overflow:hidden">
+                <div id="progressBar" style="height:18px;width:42%;background:linear-gradient(90deg,#1f6feb,#00c2ff)"></div>
               </div>
               <div class="muted" id="progressText" style="margin-top:6px">3 / 7 sessions</div>
             </div>
@@ -168,7 +206,7 @@
           </ul>
           <button class="btn ghost" onclick="alert('Mock: Sign up flow')">Get started</button>
         </div>
-        <div class="plan" style="border:2px solid #2b7cff">
+        <div class="plan" style="border:2px solid var(--accent)">
           <h3>Pro</h3>
           <div class="price">$9.99<span class="muted" style="font-size:12px">/mo</span></div>
           <div class="muted">Everything you need to stay consistent</div>
@@ -189,7 +227,7 @@
             <li class="check">Coach feedback</li>
             <li class="check">Form video notes</li>
           </ul>
-          <button class="btn alt" onclick="alert('Mock: Contact sales')">Talk to us</button>
+          <button class="btn" style="background:var(--accent2)" onclick="alert('Mock: Contact sales')">Talk to us</button>
         </div>
       </div>
     </section>
@@ -216,7 +254,7 @@
         <div class="tile">
           <div class="before">Before</div>
           <div class="after" style="margin-top:8px">After (6 wks)</div>
-          <div style="font-weight:700;margin-top:8px">Priya —2\" waist</div>
+          <div style="font-weight:700;margin-top:8px">Priya —2" waist</div>
           <div class="muted">“Felt personalized day one. Kept me consistent.”</div>
         </div>
       </div>
@@ -232,8 +270,10 @@
   };
   function syncRoute(){
     const hash = location.hash || '#/dashboard';
-    for(const k in pages){ document.getElementById(pages[k]).style.display = (k===hash)?'block':'none'; }
-    for(const id of ['link-dashboard','link-pricing','link-transformations']){
+    for (const k in pages) {
+      document.getElementById(pages[k]).style.display = (k===hash)?'block':'none';
+    }
+    for (const id of ['link-dashboard','link-pricing','link-transformations']){
       document.getElementById(id).classList.remove('active');
     }
     if(hash==='#/dashboard') document.getElementById('link-dashboard').classList.add('active');
@@ -300,6 +340,7 @@
       }
       picks.push(m);
     }
+    // Adjust calories toward target (±10%)
     const total = picks.reduce((s,m)=>s+m.kcal,0);
     const lo = Math.floor(tgt*0.9), hi = Math.ceil(tgt*1.1);
     if(total < lo) picks[3].kcal += (lo-total);
@@ -312,13 +353,13 @@
     const pct = Math.max(0, Math.min(1, used/target));
     ctx.clearRect(0,0,w,h);
     // background ring
-    ctx.lineWidth = 16; ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 16; ctx.strokeStyle = "#1f2937";
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI); ctx.stroke();
     // foreground arc
-    ctx.strokeStyle = "#2b7cff";
+    ctx.strokeStyle = "#1f6feb";
     ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + 2*Math.PI*pct); ctx.stroke();
     // text
-    ctx.fillStyle="#111827"; ctx.font="600 18px Inter, system-ui, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillStyle="#c9d1d9"; ctx.font="600 18px Inter, system-ui, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
     const remain = Math.max(0, target - used);
     ctx.fillText(remain + " kcal", cx, cy);
   }
@@ -388,218 +429,8 @@
   // First paint
   (function init(){
     syncRoute();
-    // seed visuals
     const donutCtx = document.getElementById('donut').getContext('2d');
     donut(donutCtx, 1200, 2200);
-    document.getElementById('exerciseList').innerHTML =
-      '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
-    document.getElementById('mealGrid').innerHTML =
-      '<div class="meal"><div style="font-weight:600">Breakfast</div><div class="muted">Press Generate to view personalized meals</div></div>';
-  })();
-</script>
-</body>
-</html><!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Evolve.AI — Static Investor Demo</title>
-  <style>
-    :root{--bg:#f6f7fb;--card:#fff;--muted:#7b8190;--accent:#2b7cff;--radius:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#eef3ff 0%, var(--bg) 40%);color:#111827}
-    .wrap{max-width:1000px;margin:0 auto;padding:20px}
-    .header{display:flex;justify-content:space-between;align-items:center}
-    .brand{display:flex;gap:10px;align-items:center}
-    .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(180deg,#2b7cff,#8fb6ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
-    .btn{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(43,124,255,.25)}
-    .grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
-    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(17,24,39,.06)}
-    .muted{color:var(--muted);font-size:13px}
-    .exercise{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));font-size:14px}
-    .meal{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));margin-bottom:8px}
-    details{background:#f3f6ff;border:1px solid #e3ebff;padding:8px;border-radius:10px;margin-top:6px}
-    @media (max-width:960px){.grid{grid-template-columns:1fr}}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="header">
-      <div class="brand">
-        <div class="logo">EA</div>
-        <div>
-          <div style="font-weight:800">Evolve.AI</div>
-          <div class="muted">Static investor demo — no server needed</div>
-        </div>
-      </div>
-      <div>
-        <button class="btn" onclick="generatePlan()">Generate Plan</button>
-      </div>
-    </div>
-
-    <div class="grid" style="margin-top:14px">
-      <div>
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:700;font-size:18px">Today's Workout</div><div id="workoutMeta" class="muted">Smart mock • 45–55 min</div></div>
-            <div class="muted">Week 1 • Day 1</div>
-          </div>
-          <div id="exerciseList"></div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:700;font-size:18px">Today's Meals</div><div class="muted">Calories target: <b id="calTarget">2200</b> kcal</div></div>
-            <div class="muted" id="dietBadge">Balanced</div>
-          </div>
-          <div id="mealGrid"></div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <div style="font-weight:700">Recent Activity</div>
-          <div class="muted">Latest logs</div>
-          <div id="feed" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
-        </div>
-      </div>
-
-      <aside>
-        <div class="card">
-          <div style="font-weight:700">User Profile</div>
-          <div class="muted">All runs in your browser. No backend.</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
-            <label>Age<input id="age" type="number" value="28"></label>
-            <label>Sex<select id="sex"><option>male</option><option>female</option><option>other</option></select></label>
-            <label>Height (cm)<input id="height" type="number" value="178"></label>
-            <label>Weight (kg)<input id="weight" type="number" value="80"></label>
-            <label>Goal<input id="goal" value="fat loss"></label>
-            <label>Experience<select id="exp"><option>beginner</option><option selected>intermediate</option><option>advanced</option></select></label>
-            <label>Days / week<input id="days" type="number" value="5" min="2" max="7"></label>
-            <label>Calories / day<input id="cal" type="number" value="2200"></label>
-            <label>Diet style<select id="diet"><option>balanced</option><option>high protein</option><option>lower carb</option><option>vegetarian</option><option>pescatarian</option></select></label>
-            <label style="grid-column:span 2">Equipment (comma)<input id="equip" value="dumbbells, barbell, bench"></label>
-            <label style="grid-column:span 2">Allergies (comma)<input id="allergies" value="peanuts"></label>
-          </div>
-          <button class="btn" style="width:100%;margin-top:6px" onclick="generatePlan()">Generate</button>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-<script>
-  // -------- Smart mock data (no server required) --------
-  const WORKOUT_TEMPLATES = {
-    upper: [
-      ["Barbell Bench Press",4,"6-8",90],
-      ["Pull-Ups",4,"8-10",90],
-      ["Overhead Press",3,"8-10",90],
-      ["Barbell Row",4,"8-10",90],
-      ["Incline DB Press",3,"10-12",60],
-      ["Face Pull",3,"12-15",60],
-      ["EZ-Bar Curl",3,"10-12",60]
-    ],
-    lower: [
-      ["Back Squat",4,"6-8",120],
-      ["Romanian Deadlift",3,"8-10",90],
-      ["Walking Lunge",3,"10/leg",75],
-      ["Leg Press",3,"10-12",75],
-      ["Hamstring Curl",3,"10-12",60],
-      ["Calf Raise",4,"12-15",45]
-    ],
-    full: [
-      ["Deadlift",3,"5",150],
-      ["Overhead Press",3,"8-10",90],
-      ["Pull-Ups",3,"8-10",90],
-      ["Barbell Row",3,"8-10",90],
-      ["Front Squat",3,"6-8",120],
-      ["Plank",3,"45s",45]
-    ],
-    recovery: [
-      ["Walk + Mobility",1,"—",0]
-    ]
-  };
-
-  const RECIPES = [
-    {name:"Omelet + Avocado", kcal:520, protein_g:32, carbs_g:18, fat_g:35, ingredients:["eggs","avocado","spinach"], instructions:["Whisk eggs","Cook with spinach","Top with avocado"]},
-    {name:"Chicken Bowl", kcal:650, protein_g:50, carbs_g:55, fat_g:20, ingredients:["chicken","rice","vegetables"], instructions:["Grill chicken","Steam rice","Combine"]},
-    {name:"Salmon + Quinoa", kcal:700, protein_g:45, carbs_g:60, fat_g:24, ingredients:["salmon","quinoa","asparagus"], instructions:["Bake salmon","Cook quinoa","Roast asparagus"]},
-    {name:"Greek Yogurt + Berries", kcal:320, protein_g:25, carbs_g:35, fat_g:5, ingredients:["yogurt","berries","honey"], instructions:["Mix and serve"]},
-    {name:"Greek Yogurt + Peanut Butter", kcal:420, protein_g:25, carbs_g:35, fat_g:20, ingredients:["yogurt","peanut butter","honey"], instructions:["Mix and serve"]},
-  ];
-
-  function parseList(v){ return v.split(',').map(s=>s.trim()).filter(Boolean); }
-
-  function pickMeals(tgt, diet, allergies){
-    const avoidPeanut = allergies.some(a=>/peanut/i.test(a));
-    const avoidDairy  = allergies.some(a=>/dairy/i.test(a));
-    const picks = [];
-    function choose(options){ return JSON.parse(JSON.stringify(options[Math.floor(Math.random()*options.length)])); }
-    for(const slot of ["breakfast","lunch","dinner","snack"]){
-      let m;
-      if(slot==="breakfast"){
-        m = choose(RECIPES.filter(r => avoidDairy ? r.name!=="Greek Yogurt + Berries" && r.name!=="Greek Yogurt + Peanut Butter" : true));
-      }else if(slot==="snack"){
-        m = choose(RECIPES.filter(r => avoidPeanut ? r.name!=="Greek Yogurt + Peanut Butter" : true));
-      }else{
-        m = choose(RECIPES);
-      }
-      picks.push(m);
-    }
-    // Adjust calories toward target (±10%)
-    const total = picks.reduce((s,m)=>s+m.kcal,0);
-    const lo = Math.floor(tgt*0.9), hi = Math.ceil(tgt*1.1);
-    if(total < lo) picks[3].kcal += (lo-total);
-    if(total > hi) picks[3].kcal = Math.max(150, picks[3].kcal - (total-hi));
-    return picks;
-  }
-
-  function generatePlan(){
-    const profile = {
-      age: Number(document.getElementById('age').value||28),
-      sex: document.getElementById('sex').value,
-      height_cm: Number(document.getElementById('height').value||178),
-      weight_kg: Number(document.getElementById('weight').value||80),
-      goal: document.getElementById('goal').value||'fat loss',
-      experience: document.getElementById('exp').value||'beginner',
-      equipment: parseList(document.getElementById('equip').value||''),
-      allergies: parseList(document.getElementById('allergies').value||''),
-      days_per_week: Number(document.getElementById('days').value||5),
-      calorie_target: Number(document.getElementById('cal').value||2200),
-      diet_style: document.getElementById('diet').value||'balanced'
-    };
-
-    // Workout (Day 1) based on simple pattern
-    const pattern = ["upper","lower","recovery","full","upper","lower","recovery"];
-    const focus = pattern[0];
-    const template = WORKOUT_TEMPLATES[focus] || [];
-    document.getElementById('exerciseList').innerHTML = template.map(([name,sets,reps,rest]) =>
-      `<div class='exercise'><div><div style='font-weight:600'>${name}</div><div class='muted'>${sets} × ${reps} • ${rest}s rest</div></div><button class='btn ghost' onclick='alert(\"Form cues coming soon\")'>Demo</button></div>`
-    ).join('');
-    document.getElementById('workoutMeta').textContent = 'Smart mock • 45–55 min';
-
-    // Meals (Day 1) with recipes + macros
-    const meals = pickMeals(profile.calorie_target, profile.diet_style, profile.allergies);
-    document.getElementById('calTarget').textContent = profile.calorie_target;
-    document.getElementById('dietBadge').textContent = profile.diet_style.replace(/\b\w/g, c=>c.toUpperCase());
-    document.getElementById('mealGrid').innerHTML = meals.map(m =>
-      `<div class='meal'>
-         <div style='font-weight:600'>${m.name}</div>
-         <div class='muted'>${m.kcal} kcal • P:${m.protein_g}g • C:${m.carbs_g}g • F:${m.fat_g}g</div>
-         <details><summary>Recipe & macros</summary>
-           <ul>${m.ingredients.map(i=>'<li>'+i+'</li>').join('')}</ul>
-           <ol>${m.instructions.map(i=>'<li>'+i+'</li>').join('')}</ol>
-         </details>
-       </div>`
-    ).join('');
-
-    // Feed log
-    const row = document.createElement('div');
-    row.className = 'muted';
-    row.textContent = new Date().toLocaleTimeString() + ' — Generated plan';
-    document.getElementById('feed').prepend(row);
-  }
-
-  // Seed UI
-  (function seed(){
     document.getElementById('exerciseList').innerHTML =
       '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
     document.getElementById('mealGrid').innerHTML =
