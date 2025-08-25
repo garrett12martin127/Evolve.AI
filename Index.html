@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evolve.AI — Static Investor Demo</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--muted:#7b8190;--accent:#2b7cff;--radius:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#eef3ff 0%, var(--bg) 40%);color:#111827}
+    .wrap{max-width:1000px;margin:0 auto;padding:20px}
+    .header{display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;gap:10px;align-items:center}
+    .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(180deg,#2b7cff,#8fb6ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .btn{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(43,124,255,.25)}
+    .grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(17,24,39,.06)}
+    .muted{color:var(--muted);font-size:13px}
+    .exercise{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));font-size:14px}
+    .meal{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.03));margin-bottom:8px}
+    details{background:#f3f6ff;border:1px solid #e3ebff;padding:8px;border-radius:10px;margin-top:6px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="brand">
+        <div class="logo">EA</div>
+        <div>
+          <div style="font-weight:800">Evolve.AI</div>
+          <div class="muted">Static investor demo — no server needed</div>
+        </div>
+      </div>
+      <div>
+        <button class="btn" onclick="generatePlan()">Generate Plan</button>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700;font-size:18px">Today's Workout</div><div id="workoutMeta" class="muted">Smart mock • 45–55 min</div></div>
+            <div class="muted">Week 1 • Day 1</div>
+          </div>
+          <div id="exerciseList"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-weight:700;font-size:18px">Today's Meals</div><div class="muted">Calories target: <b id="calTarget">2200</b> kcal</div></div>
+            <div class="muted" id="dietBadge">Balanced</div>
+          </div>
+          <div id="mealGrid"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="font-weight:700">Recent Activity</div>
+          <div class="muted">Latest logs</div>
+          <div id="feed" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card">
+          <div style="font-weight:700">User Profile</div>
+          <div class="muted">All runs in your browser. No backend.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+            <label>Age<input id="age" type="number" value="28"></label>
+            <label>Sex<select id="sex"><option>male</option><option>female</option><option>other</option></select></label>
+            <label>Height (cm)<input id="height" type="number" value="178"></label>
+            <label>Weight (kg)<input id="weight" type="number" value="80"></label>
+            <label>Goal<input id="goal" value="fat loss"></label>
+            <label>Experience<select id="exp"><option>beginner</option><option selected>intermediate</option><option>advanced</option></select></label>
+            <label>Days / week<input id="days" type="number" value="5" min="2" max="7"></label>
+            <label>Calories / day<input id="cal" type="number" value="2200"></label>
+            <label>Diet style<select id="diet"><option>balanced</option><option>high protein</option><option>lower carb</option><option>vegetarian</option><option>pescatarian</option></select></label>
+            <label style="grid-column:span 2">Equipment (comma)<input id="equip" value="dumbbells, barbell, bench"></label>
+            <label style="grid-column:span 2">Allergies (comma)<input id="allergies" value="peanuts"></label>
+          </div>
+          <button class="btn" style="width:100%;margin-top:6px" onclick="generatePlan()">Generate</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  // -------- Smart mock data (no server required) --------
+  const WORKOUT_TEMPLATES = {
+    upper: [
+      ["Barbell Bench Press",4,"6-8",90],
+      ["Pull-Ups",4,"8-10",90],
+      ["Overhead Press",3,"8-10",90],
+      ["Barbell Row",4,"8-10",90],
+      ["Incline DB Press",3,"10-12",60],
+      ["Face Pull",3,"12-15",60],
+      ["EZ-Bar Curl",3,"10-12",60]
+    ],
+    lower: [
+      ["Back Squat",4,"6-8",120],
+      ["Romanian Deadlift",3,"8-10",90],
+      ["Walking Lunge",3,"10/leg",75],
+      ["Leg Press",3,"10-12",75],
+      ["Hamstring Curl",3,"10-12",60],
+      ["Calf Raise",4,"12-15",45]
+    ],
+    full: [
+      ["Deadlift",3,"5",150],
+      ["Overhead Press",3,"8-10",90],
+      ["Pull-Ups",3,"8-10",90],
+      ["Barbell Row",3,"8-10",90],
+      ["Front Squat",3,"6-8",120],
+      ["Plank",3,"45s",45]
+    ],
+    recovery: [
+      ["Walk + Mobility",1,"—",0]
+    ]
+  };
+
+  const RECIPES = [
+    {name:"Omelet + Avocado", kcal:520, protein_g:32, carbs_g:18, fat_g:35, ingredients:["eggs","avocado","spinach"], instructions:["Whisk eggs","Cook with spinach","Top with avocado"]},
+    {name:"Chicken Bowl", kcal:650, protein_g:50, carbs_g:55, fat_g:20, ingredients:["chicken","rice","vegetables"], instructions:["Grill chicken","Steam rice","Combine"]},
+    {name:"Salmon + Quinoa", kcal:700, protein_g:45, carbs_g:60, fat_g:24, ingredients:["salmon","quinoa","asparagus"], instructions:["Bake salmon","Cook quinoa","Roast asparagus"]},
+    {name:"Greek Yogurt + Berries", kcal:320, protein_g:25, carbs_g:35, fat_g:5, ingredients:["yogurt","berries","honey"], instructions:["Mix and serve"]},
+    {name:"Greek Yogurt + Peanut Butter", kcal:420, protein_g:25, carbs_g:35, fat_g:20, ingredients:["yogurt","peanut butter","honey"], instructions:["Mix and serve"]},
+  ];
+
+  function parseList(v){ return v.split(',').map(s=>s.trim()).filter(Boolean); }
+
+  function pickMeals(tgt, diet, allergies){
+    const avoidPeanut = allergies.some(a=>/peanut/i.test(a));
+    const avoidDairy  = allergies.some(a=>/dairy/i.test(a));
+    const picks = [];
+    function choose(options){ return JSON.parse(JSON.stringify(options[Math.floor(Math.random()*options.length)])); }
+    for(const slot of ["breakfast","lunch","dinner","snack"]){
+      let m;
+      if(slot==="breakfast"){
+        m = choose(RECIPES.filter(r => avoidDairy ? r.name!=="Greek Yogurt + Berries" && r.name!=="Greek Yogurt + Peanut Butter" : true));
+      }else if(slot==="snack"){
+        m = choose(RECIPES.filter(r => avoidPeanut ? r.name!=="Greek Yogurt + Peanut Butter" : true));
+      }else{
+        m = choose(RECIPES);
+      }
+      picks.push(m);
+    }
+    // Adjust calories toward target (±10%)
+    const total = picks.reduce((s,m)=>s+m.kcal,0);
+    const lo = Math.floor(tgt*0.9), hi = Math.ceil(tgt*1.1);
+    if(total < lo) picks[3].kcal += (lo-total);
+    if(total > hi) picks[3].kcal = Math.max(150, picks[3].kcal - (total-hi));
+    return picks;
+  }
+
+  function generatePlan(){
+    const profile = {
+      age: Number(document.getElementById('age').value||28),
+      sex: document.getElementById('sex').value,
+      height_cm: Number(document.getElementById('height').value||178),
+      weight_kg: Number(document.getElementById('weight').value||80),
+      goal: document.getElementById('goal').value||'fat loss',
+      experience: document.getElementById('exp').value||'beginner',
+      equipment: parseList(document.getElementById('equip').value||''),
+      allergies: parseList(document.getElementById('allergies').value||''),
+      days_per_week: Number(document.getElementById('days').value||5),
+      calorie_target: Number(document.getElementById('cal').value||2200),
+      diet_style: document.getElementById('diet').value||'balanced'
+    };
+
+    // Workout (Day 1) based on simple pattern
+    const pattern = ["upper","lower","recovery","full","upper","lower","recovery"];
+    const focus = pattern[0];
+    const template = WORKOUT_TEMPLATES[focus] || [];
+    document.getElementById('exerciseList').innerHTML = template.map(([name,sets,reps,rest]) =>
+      `<div class='exercise'><div><div style='font-weight:600'>${name}</div><div class='muted'>${sets} × ${reps} • ${rest}s rest</div></div><button class='btn ghost' onclick='alert(\"Form cues coming soon\")'>Demo</button></div>`
+    ).join('');
+    document.getElementById('workoutMeta').textContent = 'Smart mock • 45–55 min';
+
+    // Meals (Day 1) with recipes + macros
+    const meals = pickMeals(profile.calorie_target, profile.diet_style, profile.allergies);
+    document.getElementById('calTarget').textContent = profile.calorie_target;
+    document.getElementById('dietBadge').textContent = profile.diet_style.replace(/\b\w/g, c=>c.toUpperCase());
+    document.getElementById('mealGrid').innerHTML = meals.map(m =>
+      `<div class='meal'>
+         <div style='font-weight:600'>${m.name}</div>
+         <div class='muted'>${m.kcal} kcal • P:${m.protein_g}g • C:${m.carbs_g}g • F:${m.fat_g}g</div>
+         <details><summary>Recipe & macros</summary>
+           <ul>${m.ingredients.map(i=>'<li>'+i+'</li>').join('')}</ul>
+           <ol>${m.instructions.map(i=>'<li>'+i+'</li>').join('')}</ol>
+         </details>
+       </div>`
+    ).join('');
+
+    // Feed log
+    const row = document.createElement('div');
+    row.className = 'muted';
+    row.textContent = new Date().toLocaleTimeString() + ' — Generated plan';
+    document.getElementById('feed').prepend(row);
+  }
+
+  // Seed UI
+  (function seed(){
+    document.getElementById('exerciseList').innerHTML =
+      '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
+    document.getElementById('mealGrid').innerHTML =
+      '<div class="meal"><div style="font-weight:600">Breakfast</div><div class="muted">Press Generate to view personalized meals</div></div>';
+  })();
+</script>
+</body>
+</html>
