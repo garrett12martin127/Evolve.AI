@@ -6,76 +6,37 @@
   <title>Evolve.AI — Medford Private Beta</title>
   <style>
     :root {
-      --bg: #0d1117;
-      --card: #161b22;
-      --muted: #8b949e;
-      --accent: #1f6feb;
-      --accent2: #00c2ff;
-      --text: #c9d1d9;
-      --radius: 12px;
+      --bg: #0d1117; --card: #161b22; --muted: #8b949e; --accent: #1f6feb; --accent2: #00c2ff; --text: #c9d1d9; --radius: 12px;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
+    * { box-sizing: border-box; } body { margin: 0; background: var(--bg); color: var(--text); }
     a { color: inherit; text-decoration: none; }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 18px; }
     .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .brand { display: flex; gap: 10px; align-items: center; }
-    .logo {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: linear-gradient(180deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 800; box-shadow: 0 0 12px rgba(0,194,255,.35);
-    }
+    .logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(180deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: 0 0 12px rgba(0,194,255,.35); }
     .muted { color: var(--muted); font-size: 13px; }
-    .btn {
-      background: var(--accent); color: #fff; border: 0;
-      padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600;
-      box-shadow: 0 0 10px var(--accent2), 0 0 20px rgba(0,194,255,.25);
-      transition: all .2s;
-    }
+    .btn { background: var(--accent); color:#fff; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; box-shadow: 0 0 10px var(--accent2), 0 0 20px rgba(0,194,255,.25); transition: all .2s; }
     .btn:hover { transform: translateY(-1px); }
-    .btn.ghost {
-      background: transparent; color: var(--accent);
-      border: 1px solid rgba(0,194,255,.5);
-      box-shadow: none;
-    }
-    nav { display: flex; gap: 10px; flex-wrap: wrap; }
-    nav a { padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; }
+    .btn.ghost { background: transparent; color: var(--accent); border: 1px solid rgba(0,194,255,.5); box-shadow: none; }
+    nav { display:flex; gap:10px; flex-wrap:wrap; }
+    nav a { padding:8px 12px; border-radius:10px; border:1px solid transparent; }
     nav a.active { border-color: var(--accent2); background: var(--card); }
-    .grid { display: grid; grid-template-columns: 1fr 360px; gap: 14px; }
-    .card {
-      background: var(--card); border-radius: 14px; padding: 16px;
-      box-shadow: 0 8px 20px rgba(0,194,255,.1);
-    }
-    .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-    .kpi { padding: 12px; border-radius: 12px; background: #0d1117; border: 1px solid #1f6feb33; }
-    .exercise, .meal {
-      padding: 12px; border-radius: 10px;
-      background: #0d1117; border: 1px solid #1f6feb33; margin-bottom: 10px;
-    }
-    details { background: #0d1117; border: 1px solid #1f6feb33; padding: 8px; border-radius: 10px; margin-top: 6px; }
-    .form label { font-size: 12px; color: var(--muted); }
-    .form input, .form select {
-      width: 100%; padding: 10px; border: 1px solid #30363d;
-      border-radius: 10px; background: #0d1117; color: var(--text);
-      margin-top: 6px; margin-bottom: 10px;
-    }
-    @media (max-width:960px) { .grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr; } }
-    .plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-    .plan { border: 1px solid #30363d; border-radius: 14px; padding: 16px; background: #0d1117; }
-    .plan h3 { margin: 0 0 6px 0; }
-    .price { font-size: 28px; font-weight: 800; color: var(--accent2); }
-    .check { color: #10b981; font-weight: 700; }
-    .cross { color: #ef4444; font-weight: 700; }
-    @media (max-width:900px){.plans{grid-template-columns:1fr}}
-    .gallery { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-    .tile { background: #0d1117; border: 1px solid #1f6feb33; border-radius: 14px; padding: 12px; }
-    .before,.after {
-      height: 140px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-weight: 700;
-    }
-    .before { background: linear-gradient(45deg,#222,#333); color: #999; }
-    .after { background: linear-gradient(45deg,#1f6feb,#00c2ff); color: #fff; }
+    .grid { display:grid; grid-template-columns:1fr 360px; gap:14px; }
+    .card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow:0 8px 20px rgba(0,194,255,.1); }
+    .kpis { display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
+    .kpi, .exercise, .meal { background:#0d1117; border:1px solid #1f6feb33; border-radius:12px; padding:12px; }
+    details { background:#0d1117; border:1px solid #1f6feb33; padding:8px; border-radius:10px; margin-top:6px; }
+    .form label { font-size:12px; color: var(--muted); }
+    .form input, .form select { width:100%; padding:10px; border:1px solid #30363d; border-radius:10px; background:#0d1117; color:var(--text); margin-top:6px; margin-bottom:10px; }
+    @media (max-width:960px){ .grid{ grid-template-columns:1fr } .kpis{ grid-template-columns:1fr } }
+    .plans { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+    .plan { border:1px solid #30363d; border-radius:14px; padding:16px; background:#0d1117; }
+    .price { font-size:28px; font-weight:800; color: var(--accent2); }
+    .gallery { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+    .tile { background:#0d1117; border:1px solid #1f6feb33; border-radius:14px; padding:12px; }
+    .before,.after { height:140px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+    .before{ background:linear-gradient(45deg,#222,#333); color:#999 } .after{ background:linear-gradient(45deg,#1f6feb,#00c2ff); color:#fff }
   </style>
 </head>
 <body>
@@ -94,7 +55,7 @@
         <a href="#/pricing" id="link-pricing">Pricing</a>
         <a href="#/transformations" id="link-transformations">Transformations</a>
       </nav>
-      <div class="row" style="display:flex; gap:8px">
+      <div style="display:flex; gap:8px">
         <button class="btn" onclick="generatePlan()">Generate Plan</button>
         <button class="btn ghost" onclick="testPing()">Test Ping</button>
       </div>
@@ -156,7 +117,6 @@
             <div id="feed" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
             <pre id="planJson" style="white-space:pre-wrap;max-height:260px;overflow:auto;background:#0b10211a;padding:10px;border-radius:10px;margin-top:10px"></pre>
           </div>
-
           <div class="card" style="margin-top:12px">
             <div style="font-weight:700">Debug</div>
             <pre id="debugLog" style="white-space:pre-wrap;max-height:240px;overflow:auto;background:#0b10211a;padding:10px;border-radius:10px;margin-top:8px">Ready…</pre>
@@ -361,76 +321,59 @@
         <div class="muted">Evolve.AI adapts to your life, equipment, and preferences.</div>
       </div>
       <div class="gallery">
-        <div class="tile">
-          <div class="before">Before</div>
-          <div class="after" style="margin-top:8px">After (8 wks)</div>
-          <div style="font-weight:700;margin-top:8px">Sarah —12 lb</div>
-          <div class="muted">“Meals were easy to follow. Workouts scaled perfectly.”</div>
-        </div>
-        <div class="tile">
-          <div class="before">Before</div>
-          <div class="after" style="margin-top:8px">After (10 wks)</div>
-          <div style="font-weight:700;margin-top:8px">Ryan +45 lb DL</div>
-          <div class="muted">“Loved the strength focus + calorie targets.”</div>
-        </div>
-        <div class="tile">
-          <div class="before">Before</div>
-          <div class="after" style="margin-top:8px">After (6 wks)</div>
-          <div style="font-weight:700;margin-top:8px">Priya —2" waist</div>
-          <div class="muted">“Felt personalized day one. Kept me consistent.”</div>
-        </div>
+        <div class="tile"><div class="before">Before</div><div class="after" style="margin-top:8px">After (8 wks)</div><div style="font-weight:700;margin-top:8px">Sarah —12 lb</div><div class="muted">“Meals were easy to follow. Workouts scaled perfectly.”</div></div>
+        <div class="tile"><div class="before">Before</div><div class="after" style="margin-top:8px">After (10 wks)</div><div style="font-weight:700;margin-top:8px">Ryan +45 lb DL</div><div class="muted">“Loved the strength focus + calorie targets.”</div></div>
+        <div class="tile"><div class="before">Before</div><div class="after" style="margin-top:8px">After (6 wks)</div><div style="font-weight:700;margin-top:8px">Priya —2&quot; waist</div><div class="muted">“Felt personalized day one. Kept me consistent.”</div></div>
       </div>
     </section>
   </div>
 
 <script>
-  // -------- Routing --------
-  const pages = {
-    '#/dashboard': 'page-dashboard',
-    '#/pricing': 'page-pricing',
-    '#/transformations': 'page-transformations'
-  };
-  function syncRoute(){
-    const hash = location.hash || '#/dashboard';
-    for (const k in pages) document.getElementById(pages[k]).style.display = (k===hash)?'block':'none';
-    for (const id of ['link-dashboard','link-pricing','link-transformations']){
-      document.getElementById(id).classList.toggle('active', ('#/'+id.split('-')[1])===hash);
-    }
-  }
+  /* ---------------- Routing ---------------- */
+  const pages = {'#/dashboard':'page-dashboard','#/pricing':'page-pricing','#/transformations':'page-transformations'};
+  function syncRoute(){ const h=location.hash||'#/dashboard'; for(const k in pages){ document.getElementById(pages[k]).style.display=(k===h)?'block':'none'; } ['link-dashboard','link-pricing','link-transformations'].forEach(id=>document.getElementById(id).classList.toggle('active',('#/'+id.split('-')[1])===h)); }
   window.addEventListener('hashchange', syncRoute);
 
-  // -------- Visuals --------
+  /* ---------------- Visuals ---------------- */
   function donut(ctx, used, target){
-    const w = ctx.canvas.width, h = ctx.canvas.height, r = Math.min(w,h)/2 - 10, cx = w/2, cy = h/2;
-    const pct = Math.max(0, Math.min(1, used/target));
-    ctx.clearRect(0,0,w,h);
-    ctx.lineWidth = 16; ctx.strokeStyle = "#1f2937";
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI); ctx.stroke();
-    ctx.strokeStyle = "#1f6feb";
-    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + 2*Math.PI*pct); ctx.stroke();
-    ctx.fillStyle="#c9d1d9"; ctx.font="600 18px Inter, system-ui, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    const remain = Math.max(0, target - used); ctx.fillText(remain + " kcal", cx, cy);
+    const w=ctx.canvas.width,h=ctx.canvas.height,r=Math.min(w,h)/2-10,cx=w/2,cy=h/2,pct=Math.max(0,Math.min(1,used/target));
+    ctx.clearRect(0,0,w,h); ctx.lineWidth=16; ctx.strokeStyle="#1f2937"; ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI); ctx.stroke();
+    ctx.strokeStyle="#1f6feb"; ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+2*Math.PI*pct); ctx.stroke();
+    ctx.fillStyle="#c9d1d9"; ctx.font="600 18px Inter, system-ui, sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(Math.max(0,target-used)+" kcal",cx,cy);
   }
 
-  // -------- Helpers --------
-  function dlog(){ const el = document.getElementById('debugLog'); const line=[...arguments].map(a=>typeof a==='string'?a:JSON.stringify(a)).join(' '); el.textContent=(el.textContent?el.textContent+'\n':'')+line; }
-  function ftInToCm(ft, inch){ const totalIn = (Number(ft)||0)*12 + (Number(inch)||0); return Math.round(totalIn*2.54); }
-  function lbToKg(lb){ return Math.round((Number(lb)||0) * 0.453592 * 10) / 10; }
+  /* ---------------- Helpers ---------------- */
+  function dlog(){ const el=document.getElementById('debugLog'); const line=[...arguments].map(a=>typeof a==='string'?a:JSON.stringify(a)).join(' '); el.textContent=(el.textContent?el.textContent+'\n':'')+line; }
+  function ftInToCm(ft,inch){ const total=(Number(ft)||0)*12+(Number(inch)||0); return Math.round(total*2.54); }
+  function lbToKg(lb){ return Math.round((Number(lb)||0)*0.453592*10)/10; }
   function splitList(id){ return (document.getElementById(id).value||'').split(',').map(s=>s.trim()).filter(Boolean); }
 
-  // If you host HTML on GitHub Pages, set your Netlify site below:
-  const NETLIFY_URL = 'https://evolveaigm.netlify.app'; // ← replace YOUR-SITE if NOT hosting HTML on Netlify
+  // If HTML is on GitHub Pages, set your Netlify URL here; if site is on Netlify, leave as ''.
+  const NETLIFY_URL = ''; // e.g., 'https://evolveaigm.netlify.app' (only if NOT hosting HTML on Netlify)
 
   async function testPing(){
-    const endpoint = location.hostname.endsWith('netlify.app')
-      ? '/.netlify/functions/ping'
-      : NETLIFY_URL + '/.netlify/functions/ping';
+    const endpoint = NETLIFY_URL ? NETLIFY_URL + '/.netlify/functions/ping' : '/.netlify/functions/ping';
     dlog('Ping →', endpoint);
-    try { const r = await fetch(endpoint); dlog('Ping status:', r.status); dlog('Ping body:', await r.text()); }
+    try { const r=await fetch(endpoint); dlog('Ping status:', r.status); dlog('Ping body:', await r.text()); }
     catch(e){ dlog('Ping error:', String(e)); }
   }
 
-  // -------- Generate Plan (calls Netlify function) --------
+  /* -------- Normalize AI output to a stable shape -------- */
+  function pickPlanDay(data){
+    if(!data || typeof data!=='object') return {workouts:[],meals:[],focus:'full',day:1};
+    let week=[];
+    if(Array.isArray(data.week)) week=data.week;
+    else if(data.week && Array.isArray(data.week.days)) week=data.week.days;
+    else if(data.plan && Array.isArray(data.plan.week)) week=data.plan.week;
+    if(!week.length && (data.workouts||data.meals)){
+      return { day: data.day||1, focus: data.focus||'full', workouts: Array.isArray(data.workouts)?data.workouts:[], meals: Array.isArray(data.meals)?data.meals:[] };
+    }
+    if(!week.length) return {workouts:[],meals:[],focus:'full',day:1};
+    const day = week.find(d=>d.day===1) || week.find(d => (d?.workouts?.length||0)+(d?.meals?.length||0)>0) || week[0];
+    return { day: typeof day.day==='number'?day.day:1, focus: day.focus||'full', workouts: Array.isArray(day.workouts)?day.workouts:[], meals: Array.isArray(day.meals)?day.meals:[] };
+  }
+
+  /* ---------------- Generate Plan (calls Netlify Function) ---------------- */
   async function generatePlan(){
     const profile = {
       age: Number(document.getElementById('age').value||28),
@@ -459,67 +402,74 @@
       reminders: document.getElementById('reminders').value
     };
 
-    const endpoint = location.hostname.endsWith('netlify.app')
-      ? '/.netlify/functions/generate-plan'
-      : NETLIFY_URL + '/.netlify/functions/generate-plan';
+    const endpoint = NETLIFY_URL ? NETLIFY_URL + '/.netlify/functions/generate-plan' : '/.netlify/functions/generate-plan';
 
     dlog('Generate → POST', endpoint);
     dlog('Profile:', profile);
 
     try{
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(profile)
-      });
+      const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(profile) });
       const txt = await res.text();
-      dlog('Status:', res.status);
-      dlog('Raw response:', txt);
+      dlog('Status:', res.status); dlog('Raw response:', txt);
 
       if(!res.ok){ document.getElementById('planJson').textContent = `Error ${res.status}:\n` + txt; alert('Server error. See Debug/JSON panels.'); return; }
 
       let data;
-      try { data = JSON.parse(txt); }
-      catch(e){ document.getElementById('planJson').textContent = 'Bad JSON from server:\n' + txt; alert('Bad JSON from server. See Debug/JSON panels.'); return; }
+      try { data = JSON.parse(txt); } catch { document.getElementById('planJson').textContent = 'Bad JSON from server:\n' + txt; alert('Bad JSON from server.'); return; }
 
-      const day1 = data?.week?.[0] || { workouts: [], meals: [], focus: 'full' };
+      const day1 = pickPlanDay(data);
 
-      // Workouts
-      document.getElementById('exerciseList').innerHTML = (day1.workouts||[]).map(x =>
-        `<div class='exercise'><div><div style='font-weight:600'>${x.exercise}</div><div class='muted'>${x.sets} × ${x.reps} • ${x.rest_sec || 60}s rest</div></div><button class='btn ghost' onclick='alert("Form cues coming soon")'>Demo</button></div>`
-      ).join('');
+      // Render workouts
+      if(!day1.workouts.length){
+        document.getElementById('exerciseList').innerHTML = `<div class="exercise"><div><div style="font-weight:600">No workouts returned</div><div class="muted">Check JSON panel for details.</div></div></div>`;
+      } else {
+        document.getElementById('exerciseList').innerHTML = day1.workouts.map(x=>{
+          const name = x.exercise || x.name || 'Exercise';
+          const sets = (typeof x.sets==='number' || typeof x.sets==='string') ? x.sets : '—';
+          const reps = x.reps || x.rep_range || '—';
+          const rest = x.rest_sec || x.rest || 60;
+          return `<div class='exercise'><div><div style='font-weight:600'>${name}</div><div class='muted'>${sets} × ${reps} • ${rest}s rest</div></div><button class='btn ghost' onclick='alert("Form cues coming soon")'>Demo</button></div>`;
+        }).join('');
+      }
+
+      // Render meals
+      if(!day1.meals.length){
+        document.getElementById('mealGrid').innerHTML = `<div class="meal"><div style="font-weight:600">No meals returned</div><div class="muted">Check JSON panel for details.</div></div>`;
+      } else {
+        document.getElementById('mealGrid').innerHTML = day1.meals.map(m=>{
+          const name = m.name || 'Meal';
+          const kcal = m.kcal ?? m.calories ?? 0;
+          const p = m.protein_g ?? m.protein ?? 0;
+          const c = m.carbs_g ?? m.carbs ?? 0;
+          const f = m.fat_g ?? m.fat ?? 0;
+          const ing = Array.isArray(m.ingredients)?m.ingredients:[];
+          const inst = Array.isArray(m.instructions)?m.instructions:[];
+          return `<div class='meal'>
+            <div style='font-weight:600'>${name}</div>
+            <div class='muted'>${kcal} kcal • P:${p}g • C:${c}g • F:${f}g</div>
+            <details><summary>Recipe & macros</summary>
+              <ul>${ing.map(i=>'<li>'+i+'</li>').join('')}</ul>
+              <ol>${inst.map(i=>'<li>'+i+'</li>').join('')}</ol>
+            </details>
+          </div>`;
+        }).join('');
+      }
+
+      // KPIs + meta
       document.getElementById('workoutMeta').textContent = `${day1.focus || 'training'} • ${profile.session_length}`;
-
-      // Meals
       document.getElementById('calTarget').textContent = profile.calorie_target;
       document.getElementById('dietBadge').textContent = profile.diet_style.replace(/\b\w/g, c=>c.toUpperCase());
-      document.getElementById('mealGrid').innerHTML = (day1.meals||[]).map(m =>
-        `<div class='meal'>
-           <div style='font-weight:600'>${m.name || 'Meal'}</div>
-           <div class='muted'>${m.kcal || 0} kcal • P:${m.protein_g || 0}g • C:${m.carbs_g || 0}g • F:${m.fat_g || 0}g</div>
-           <details><summary>Recipe & macros</summary>
-             <ul>${(m.ingredients||[]).map(i=>'<li>'+i+'</li>').join('')}</ul>
-             <ol>${(m.instructions||[]).map(i=>'<li>'+i+'</li>').join('')}</ol>
-           </details>
-         </div>`
-      ).join('');
+      const used = Math.round((day1.meals||[]).reduce((s,m)=>s+(m.kcal ?? m.calories ?? 0),0)*0.75);
+      donut(document.getElementById('donut').getContext('2d'), used, profile.calorie_target);
 
-      // Donut KPI
-      const used = Math.round((day1.meals||[]).reduce((s,m)=>s+(m.kcal||0),0)*0.75);
-      const ctx = document.getElementById('donut').getContext('2d');
-      donut(ctx, used, profile.calorie_target);
-
-      // Progress mock
+      // Progress mock + JSON + feed
       const completed = Math.min(7, Math.floor(Math.random()*5)+2);
       document.getElementById('progressBar').style.width = Math.round((completed/7)*100) + '%';
       document.getElementById('progressText').textContent = `${completed} / 7 sessions`;
       document.getElementById('weekSummary').textContent = `${Math.round(profile.calorie_target*0.98)} avg kcal · ${profile.days_per_week} workouts planned`;
 
-      // JSON and feed
-      document.getElementById('planJson').textContent = JSON.stringify({profile, plan:data}, null, 2);
-      const row = document.createElement('div'); row.className='muted';
-      row.textContent = new Date().toLocaleTimeString() + ' — Generated plan via function';
-      document.getElementById('feed').prepend(row);
+      document.getElementById('planJson').textContent = JSON.stringify({ profile, plan: data }, null, 2);
+      const row=document.createElement('div'); row.className='muted'; row.textContent=new Date().toLocaleTimeString()+' — Rendered plan'; document.getElementById('feed').prepend(row);
 
     }catch(e){
       dlog('Fetch error:', String(e));
@@ -528,15 +478,12 @@
     }
   }
 
-  // -------- First paint --------
+  /* ---------------- First paint ---------------- */
   (function init(){
     syncRoute();
-    const donutCtx = document.getElementById('donut').getContext('2d');
-    donut(donutCtx, 1200, 2200);
-    document.getElementById('exerciseList').innerHTML =
-      '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
-    document.getElementById('mealGrid').innerHTML =
-      '<div class="meal"><div style="font-weight:600">Breakfast</div><div class="muted">Press Generate to view personalized meals</div></div>';
+    const ctx=document.getElementById('donut').getContext('2d'); donut(ctx,1200,2200);
+    document.getElementById('exerciseList').innerHTML = '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
+    document.getElementById('mealGrid').innerHTML = '<div class="meal"><div style="font-weight:600">Breakfast</div><div class="muted">Press Generate to view personalized meals</div></div>';
   })();
 </script>
 </body>
