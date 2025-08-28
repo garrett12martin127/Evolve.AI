@@ -164,28 +164,149 @@
         </div>
 
         <!-- Profile -->
-        <aside>
-          <div class="card">
-            <div style="font-weight:700">User Profile</div>
-            <div class="muted">Runs fully in your browser — no backend</div>
-            <div class="form" style="margin-top:6px">
-              <label>Age<input id="age" type="number" value="28"></label>
-              <label>Sex<select id="sex"><option>male</option><option>female</option><option>other</option></select></label>
-              <label>Height (cm)<input id="height" type="number" value="178"></label>
-              <label>Weight (kg)<input id="weight" type="number" value="80"></label>
-              <label>Goal<input id="goal" value="fat loss"></label>
-              <label>Experience<select id="exp"><option>beginner</option><option selected>intermediate</option><option>advanced</option></select></label>
-              <label>Days / week<input id="days" type="number" value="5" min="2" max="7"></label>
-              <label>Calories / day<input id="cal" type="number" value="2200"></label>
-              <label>Diet style<select id="diet"><option>balanced</option><option>high protein</option><option>lower carb</option><option>vegetarian</option><option>pescatarian</option></select></label>
-              <label>Equipment (comma separated)<input id="equip" value="dumbbells, barbell, bench"></label>
-              <label>Allergies (comma separated)<input id="allergies" value="peanuts"></label>
-            </div>
-            <button class="btn" style="width:100%" onclick="generatePlan()">Generate Plan</button>
-          </div>
-        </aside>
+<aside>
+  <div class="card">
+    <div style="font-weight:700">Your Profile</div>
+    <div class="muted">Tell Evolve.AI how to tailor your plan</div>
+
+    <!-- Basics -->
+    <div class="form" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">Basics</div>
+      <label>Age<input id="age" type="number" value="28" min="13" max="90"></label>
+      <label>Sex
+        <select id="sex"><option>male</option><option>female</option><option>other</option></select>
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label>Height — Feet<input id="height_ft" type="number" value="5" min="3" max="7"></label>
+        <label>Height — Inches<input id="height_in" type="number" value="10" min="0" max="11"></label>
       </div>
-    </section>
+      <label>Weight (lb)<input id="weight_lb" type="number" value="176" min="70" max="500"></label>
+    </div>
+
+    <!-- Goals & Lifestyle -->
+    <div class="form" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">Goals & Lifestyle</div>
+      <label>What are you training for?
+        <select id="training_for">
+          <option value="fat loss">Fat loss</option>
+          <option value="muscle gain">Muscle gain</option>
+          <option value="general fitness" selected>General fitness</option>
+          <option value="sports performance">Sports performance</option>
+          <option value="rehab">Injury rehab / return to play</option>
+          <option value="longevity">Longevity & healthspan</option>
+          <option value="aesthetics">Aesthetics / recomposition</option>
+        </select>
+      </label>
+      <label>Do you play any sports? (comma)
+        <input id="sports" placeholder="soccer, basketball">
+      </label>
+      <label>Lifestyle activity
+        <select id="activity_level">
+          <option>sedentary</option>
+          <option>light</option>
+          <option selected>moderate</option>
+          <option>very active</option>
+        </select>
+      </label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label>Preferred training time
+          <select id="training_time">
+            <option>morning</option><option>midday</option><option selected>evening</option>
+          </select>
+        </label>
+        <label>Session length
+          <select id="session_length">
+            <option>30 min</option><option selected>45 min</option><option>60 min</option><option>90 min</option>
+          </select>
+        </label>
+      </div>
+      <label>Days per week<input id="days" type="number" value="5" min="2" max="7"></label>
+      <label>Equipment access
+        <select id="equipment_access">
+          <option selected>full gym</option>
+          <option>home gym</option>
+          <option>limited equipment</option>
+          <option>no equipment</option>
+        </select>
+      </label>
+      <label>Equipment list (comma)
+        <input id="equip" value="dumbbells, barbell, bench">
+      </label>
+    </div>
+
+    <!-- Limitations & Safety -->
+    <div class="form" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">Limitations & Safety</div>
+      <label>Injuries or movement limits (comma)
+        <input id="injuries" placeholder="knee pain, lower back">
+      </label>
+      <label>Medical conditions (optional)
+        <input id="medical" placeholder="hypertension, asthma">
+      </label>
+    </div>
+
+    <!-- Nutrition & Recovery -->
+    <div class="form" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">Nutrition & Recovery</div>
+      <label>Diet style
+        <select id="diet">
+          <option selected>balanced</option>
+          <option>high protein</option>
+          <option>lower carb</option>
+          <option>vegetarian</option>
+          <option>pescatarian</option>
+          <option>plant-based</option>
+          <option>paleo</option>
+          <option>keto</option>
+        </select>
+      </label>
+      <label>Food allergies (comma)<input id="allergies" placeholder="peanuts, shellfish"></label>
+      <label>Food dislikes / restrictions (comma)<input id="food_dislikes" placeholder="no seafood, no dairy"></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label>Calories / day<input id="cal" type="number" value="2200" min="1200" max="4500"></label>
+        <label>Sleep (hrs/night)<input id="sleep_hours" type="number" value="7" min="3" max="12"></label>
+      </div>
+      <label>Stress level
+        <select id="stress_level">
+          <option>low</option><option selected>medium</option><option>high</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Motivation & Tracking -->
+    <div class="form" style="margin-top:8px">
+      <div style="font-weight:700;margin-bottom:4px">Motivation & Tracking</div>
+      <label>Why now?
+        <select id="motivation">
+          <option>personal health</option>
+          <option>appearance / confidence</option>
+          <option>performance / competition</option>
+          <option selected>consistency & accountability</option>
+        </select>
+      </label>
+      <label>How to track progress?
+        <select id="tracking_pref">
+          <option>scale weight</option>
+          <option selected>strength PRs</option>
+          <option>body measurements</option>
+          <option>photos</option>
+          <option>endurance metrics</option>
+          <option>energy / mood</option>
+        </select>
+      </label>
+      <label>Accountability reminders
+        <select id="reminders">
+          <option>none</option>
+          <option selected>weekly summary</option>
+          <option>daily nudges</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="btn" style="width:100%;margin-top:6px" onclick="generatePlan()">Generate Plan</button>
+  </div>
+</aside>
 
     <!-- PRICING -->
     <section id="page-pricing" style="display:none;margin-top:14px">
