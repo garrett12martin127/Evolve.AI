@@ -560,3 +560,28 @@
 </script>
 </body>
 </html>
+      ...
+  <!-- Your page content -->
+  
+  <!-- All your other scripts (donut, generatePlan, etc.) -->
+
+  <!-- Debug + Ping helpers -->
+  <script>
+    function dlog(...args){
+      const el = document.getElementById('debugLog');
+      const line = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+      el.textContent = (el.textContent ? el.textContent + '\n' : '') + line;
+    }
+    async function testPing(){
+      try{
+        const url = (location.hostname.endsWith('netlify.app'))
+          ? '/.netlify/functions/ping'
+          : 'https://evolveaigm.netlify.app/.netlify/functions/ping'; 
+        dlog('Ping →', url);
+        const r = await fetch(url); dlog('Ping status:', r.status);
+        dlog('Ping body:', await r.text());
+      }catch(e){ dlog('Ping error:', String(e)); }
+    }
+  </script>
+</body>
+</html>
