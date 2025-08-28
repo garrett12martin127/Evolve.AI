@@ -1,8 +1,8 @@
 // netlify/functions/generate-plan.js
-// CommonJS; works well on Netlify. Includes CORS and a safe fallback if no API key.
+// CommonJS; includes CORS + a safe fallback if OPENAI_API_KEY is missing.
 
 exports.handler = async (event) => {
-  // --- CORS preflight ---
+  // CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || '{}');
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-    // If no key yet, return a simple plan so the UI shows something (helps debug plumbing).
+    // Fallback plan so UI shows something even without a key (helps diagnose plumbing)
     if (!OPENAI_API_KEY) {
       return {
         statusCode: 200,
@@ -49,7 +49,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Build a prompt that uses all onboarding info
+    // Build prompt from profile
     const profile = body;
     const prompt = `
 You are Evolve.AI, an expert coach and sports nutritionist.
@@ -68,7 +68,6 @@ ${JSON.stringify(profile)}
 Rules: professional-grade training (6–7 movements per training day); respect injuries & equipment; match diet style & allergies; hit calorie_target ±10%; keep instructions concise. Return ONLY JSON.
 `;
 
-    // Call OpenAI Responses API
     const resp = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
@@ -76,8 +75,7 @@ Rules: professional-grade training (6–7 movements per training day); respect i
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        // Change this model if your account uses a different one, e.g., 'gpt-4o-mini'
-        model: 'gpt-5.1-mini',
+        model: 'gpt-5.1-mini',   // change if your account uses a different model, e.g. 'gpt-4o-mini'
         input: prompt,
         temperature: 0.7,
         max_output_tokens: 3000
@@ -85,10 +83,7 @@ Rules: professional-grade training (6–7 movements per training day); respect i
     });
 
     const data = await resp.json();
-    const text =
-      data?.output_text ||
-      data?.choices?.[0]?.message?.content ||
-      data?.choices?.[0]?.text || '';
+    const text = data?.output_text || data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '';
 
     let plan;
     try { plan = JSON.parse(text); }
@@ -111,3 +106,4 @@ Rules: professional-grade training (6–7 movements per training day); respect i
     };
   }
 };
+    
