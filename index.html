@@ -1,438 +1,720 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evolve.AI</title>
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evolve.AI — Medford Private Beta</title>
   <style>
-    /* Global dark theme with neon-blue accents */
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #05070c;
-      color: #f0f2f5;
-      min-height: 100vh;
+    :root {
+      /* Dark theme with blue accents matching your original index */
+      --bg: #0d1117; 
+      --card: #161b22; 
+      --muted: #8b949e; 
+      --accent: #1f6feb; 
+      --accent2: #00c2ff; 
+      --text: #c9d1d9; 
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
 
-    /* Navbar styles */
-    .navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-      background: #0b1220;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    .navbar img.logo {
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+
+    /* Layout */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px; }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .brand { display: flex; gap: 10px; align-items: center; }
+
+    /* Updated logo styling – shows your image at 40×40 and keeps the rounded/glow effect */
+    .logo {
       width: 40px;
       height: 40px;
-      object-fit: contain;
-      margin-right: 0.5rem;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(0, 194, 255, 0.35);
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
     }
-    .navbar .brand {
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 0 10px var(--accent2), 0 0 20px rgba(0, 194, 255, .25);
+      transition: all .2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.ghost {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(0, 194, 255, .5);
+      box-shadow: none;
+    }
+
+    nav { display: flex; gap: 10px; flex-wrap: wrap; }
+    nav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+    nav a.active { border-color: var(--accent2); background: var(--card); }
+
+    .grid { display: grid; grid-template-columns: 1fr 360px; gap: 14px; }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(0, 194, 255, .1);
+    }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kpi, .exercise, .meal {
+      background: #0d1117;
+      border: 1px solid #1f6feb33;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    details {
+      background: #0d1117;
+      border: 1px solid #1f6feb33;
+      padding: 8px;
+      border-radius: 10px;
+      margin-top: 6px;
+    }
+    .form label { font-size: 12px; color: var(--muted); }
+    .form input, .form select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      background: #0d1117;
+      color: var(--text);
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+    }
+
+    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .plan {
+      border: 1px solid #30363d;
+      border-radius: 14px;
+      padding: 16px;
+      background: #0d1117;
+    }
+    .price { font-size: 28px; font-weight: 800; color: var(--accent2); }
+    .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .tile {
+      background: #0d1117;
+      border: 1px solid #1f6feb33;
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .before, .after {
+      height: 140px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #00aaff;
+      justify-content: center;
+      font-weight: 700;
     }
-    .nav-links a {
-      color: #a0b3c9;
-      margin-left: 1rem;
-      padding: 0.25rem 0.5rem;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover {
-      color: #00aaff;
-    }
-
-    /* Section containers */
-    .section-card {
-      background: #0b1220;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-      margin-bottom: 1.5rem;
-    }
-
-    /* Buttons */
-    .btn-primary {
-      background: #0077cc;
-      color: #fff;
-      padding: 0.6rem 1rem;
-      border-radius: 0.375rem;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover {
-      background: #0099ff;
-    }
-
-    /* Cards for workout/meal sections */
-    .card-header {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      color: #00aaff;
-    }
-
-    /* Scroll areas for debug/JSON panels */
-    .scroll-box {
-      max-height: 12rem;
-      overflow-y: auto;
-      background: #0f172a;
-      padding: 0.75rem;
-      border-radius: 0.375rem;
-      font-family: monospace;
-      font-size: 0.85rem;
-    }
-
-    /* Form inputs */
-    .form-control input,
-    .form-control select,
-    .form-control textarea {
-      background: #0f172a;
-      color: #cbd5e1;
-      border: 1px solid #26374d;
-      border-radius: 0.375rem;
-      padding: 0.5rem 0.75rem;
-      width: 100%;
-      margin-top: 0.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .form-control label {
-      font-weight: 500;
-      color: #94a3b8;
-    }
+    .before { background: linear-gradient(45deg, #222, #333); color: #999; }
+    .after { background: linear-gradient(45deg, #1f6feb, #00c2ff); color: #fff; }
   </style>
 </head>
-<body class="antialiased">
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="brand">
-      <img src="logo.png" alt="Evolve.ai logo" class="logo" />
-      evolve.ai
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="logo">
+          <!-- Insert your logo here. Update the file name/path as needed -->
+          <img src="evolve_ai_logo.jpeg" alt="Evolve.AI logo">
+        </div>
+        <div>
+          <div style="font-weight: 800">Evolve.AI</div>
+          <div class="muted">Medford Private Beta · Aug 17, 2025</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#/dashboard" id="link-dashboard" class="active">Dashboard</a>
+        <a href="#/pricing" id="link-pricing">Pricing</a>
+        <a href="#/transformations" id="link-transformations">Transformations</a>
+      </nav>
+      <div style="display: flex; gap: 8px">
+        <button class="btn" onclick="generatePlan()">Generate Plan</button>
+        <button class="btn ghost" onclick="testPing()">Test Ping</button>
+      </div>
     </div>
-    <div class="nav-links hidden md:flex">
-      <a href="#dashboard">Dashboard</a>
-      <a href="#profile">Profile</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#transformations">Transformations</a>
-    </div>
-  </nav>
 
-  <!-- Main container -->
-  <main class="max-w-6xl mx-auto p-4 md:p-8">
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="section-card">
-      <h2 class="text-xl font-semibold mb-4 text-blue-400">Dashboard</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Calories Remaining Card -->
-        <div class="bg-[#0f172a] p-6 rounded-lg shadow-md">
-          <h3 class="card-header">Calories Remaining</h3>
-          <div class="flex items-center justify-between">
-            <span class="text-4xl font-bold" id="calsRemaining">1000</span>
-            <div>
-              <p class="text-sm text-gray-400">Target <span id="calsTarget">2200</span> kcal</p>
+    <!-- DASHBOARD -->
+    <section id="page-dashboard">
+      <div class="grid" style="margin-top: 14px">
+        <div>
+          <!-- KPI row -->
+          <div class="kpis">
+            <div class="kpi">
+              <div class="muted">Calories Remaining</div>
+              <canvas id="donut" width="240" height="140" style="width: 100%"></canvas>
+              <div class="muted" id="kcalText">Target 2200 kcal</div>
+            </div>
+            <div class="kpi">
+              <div class="muted">Workout Completion</div>
+              <div style="height: 18px; border-radius: 10px; background: #1f2937; overflow: hidden">
+                <div id="progressBar" style="height: 18px; width: 42%; background: linear-gradient(90deg, #1f6feb, #00c2ff)"></div>
+              </div>
+              <div class="muted" id="progressText" style="margin-top: 6px">3 / 7 sessions</div>
+            </div>
+            <div class="kpi">
+              <div class="muted">This Week</div>
+              <div id="weekSummary" style="font-weight: 700; font-size: 22px; margin-top: 8px">2,150 avg kcal · 4 workouts planned</div>
+              <div class="muted">Auto-adjusts from your logs</div>
             </div>
           </div>
-        </div>
-        <!-- Workout Completion Card -->
-        <div class="bg-[#0f172a] p-6 rounded-lg shadow-md">
-          <h3 class="card-header">Workout Completion</h3>
-          <div class="mb-2">
-            <progress id="workoutProgress" value="0" max="1" class="w-full h-2 accent-blue-500"></progress>
-          </div>
-          <p class="text-sm text-gray-400"><span id="workoutSessionsDone">0</span> / <span id="workoutSessionsTotal">0</span> sessions</p>
-        </div>
-        <!-- This Week Card -->
-        <div class="bg-[#0f172a] p-6 rounded-lg shadow-md">
-          <h3 class="card-header">This Week</h3>
-          <p class="text-lg font-bold mb-2" id="weeklySummary">
-            0 avg kcal · 0 workouts planned
-          </p>
-          <p class="text-gray-400 text-sm">
-            Auto-adjusts from your logs
-          </p>
-        </div>
-      </div>
 
-      <!-- Today's Workout & Meals -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <!-- Today's Workout -->
-        <div class="bg-[#0f172a] p-6 rounded-lg shadow-md">
-          <h3 class="card-header">Today's Workout</h3>
-          <div id="todaysWorkout">
-            <p class="text-gray-500 italic">Press Generate to view personalized workouts</p>
+          <!-- Today’s workout -->
+          <div class="card" style="margin-top: 12px">
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <div style="font-weight: 700; font-size: 18px">Today's Workout</div>
+                <div id="workoutMeta" class="muted">Smart mock • 50–60 min</div>
+              </div>
+              <div class="muted" id="weekBadge">Week 1 • Day 1</div>
+            </div>
+            <div id="exerciseList"></div>
+          </div>
+
+          <!-- Today’s meals -->
+          <div class="card" style="margin-top: 12px">
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <div style="font-weight: 700; font-size: 18px">Today's Meals</div>
+                <div class="muted">Calories target: <b id="calTarget">2200</b> kcal</div>
+              </div>
+              <div class="muted" id="dietBadge">Balanced</div>
+            </div>
+            <div id="mealGrid"></div>
+          </div>
+
+          <!-- Activity feed + Debug -->
+          <div class="card" style="margin-top: 12px">
+            <div style="font-weight: 700">Recent Activity</div>
+            <div class="muted">Latest logs</div>
+            <div id="feed" style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px"></div>
+            <pre id="planJson" style="white-space: pre-wrap; max-height: 260px; overflow: auto; background: #0b10211a; padding: 10px; border-radius: 10px; margin-top: 10px"></pre>
+          </div>
+          <div class="card" style="margin-top: 12px">
+            <div style="font-weight: 700">Debug</div>
+            <pre id="debugLog" style="white-space: pre-wrap; max-height: 240px; overflow: auto; background: #0b10211a; padding: 10px; border-radius: 10px; margin-top: 8px">Ready…</pre>
           </div>
         </div>
-        <!-- Today's Meals -->
-        <div class="bg-[#0f172a] p-6 rounded-lg shadow-md">
-          <h3 class="card-header">Today's Meals</h3>
-          <div id="todaysMeals">
-            <p class="text-gray-500 italic">Press Generate to view personalized meals</p>
+
+        <!-- Profile (enhanced onboarding) -->
+        <aside>
+          <div class="card">
+            <div style="font-weight: 700">Your Profile</div>
+            <div class="muted">Tell Evolve.AI how to tailor your plan</div>
+
+            <!-- Basics -->
+            <div class="form" style="margin-top: 8px">
+              <div style="font-weight: 700; margin-bottom: 4px">Basics</div>
+              <label>Age
+                <input id="age" type="number" value="28" min="13" max="90">
+              </label>
+              <label>Sex
+                <select id="sex">
+                  <option>male</option>
+                  <option>female</option>
+                  <option>other</option>
+                </select>
+              </label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                <label>Height — Feet
+                  <input id="height_ft" type="number" value="5" min="3" max="7">
+                </label>
+                <label>Height — Inches
+                  <input id="height_in" type="number" value="10" min="0" max="11">
+                </label>
+              </div>
+              <label>Weight (lb)
+                <input id="weight_lb" type="number" value="176" min="70" max="500">
+              </label>
+            </div>
+
+            <!-- Goals & Lifestyle -->
+            <div class="form" style="margin-top: 8px">
+              <div style="font-weight: 700; margin-bottom: 4px">Goals & Lifestyle</div>
+              <label>What are you training for?
+                <select id="training_for">
+                  <option value="fat loss">Fat loss</option>
+                  <option value="muscle gain">Muscle gain</option>
+                  <option value="general fitness" selected>General fitness</option>
+                  <option value="sports performance">Sports performance</option>
+                  <option value="rehab">Injury rehab / return to play</option>
+                  <option value="longevity">Longevity & healthspan</option>
+                  <option value="aesthetics">Aesthetics / recomposition</option>
+                </select>
+              </label>
+              <label>Do you play any sports? (comma)
+                <input id="sports" placeholder="soccer, basketball">
+              </label>
+              <label>Lifestyle activity
+                <select id="activity_level">
+                  <option>sedentary</option>
+                  <option>light</option>
+                  <option selected>moderate</option>
+                  <option>very active</option>
+                </select>
+              </label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                <label>Preferred training time
+                  <select id="training_time">
+                    <option>morning</option>
+                    <option>midday</option>
+                    <option selected>evening</option>
+                  </select>
+                </label>
+                <label>Session length
+                  <select id="session_length">
+                    <option>30 min</option>
+                    <option selected>45 min</option>
+                    <option>60 min</option>
+                    <option>90 min</option>
+                  </select>
+                </label>
+              </div>
+              <label>Days per week
+                <input id="days" type="number" value="5" min="2" max="7">
+              </label>
+              <label>Equipment access
+                <select id="equipment_access">
+                  <option selected>full gym</option>
+                  <option>home gym</option>
+                  <option>limited equipment</option>
+                  <option>no equipment</option>
+                </select>
+              </label>
+              <label>Equipment list (comma)
+                <input id="equip" value="dumbbells, barbell, bench">
+              </label>
+            </div>
+
+            <!-- Limitations & Safety -->
+            <div class="form" style="margin-top: 8px">
+              <div style="font-weight: 700; margin-bottom: 4px">Limitations & Safety</div>
+              <label>Injuries or movement limits (comma)
+                <input id="injuries" placeholder="knee pain, lower back">
+              </label>
+              <label>Medical conditions (optional)
+                <input id="medical" placeholder="hypertension, asthma">
+              </label>
+            </div>
+
+            <!-- Nutrition & Recovery -->
+            <div class="form" style="margin-top: 8px">
+              <div style="font-weight: 700; margin-bottom: 4px">Nutrition & Recovery</div>
+              <label>Diet style
+                <select id="diet">
+                  <option selected>balanced</option>
+                  <option>high protein</option>
+                  <option>lower carb</option>
+                  <option>vegetarian</option>
+                  <option>pescatarian</option>
+                  <option>plant-based</option>
+                  <option>paleo</option>
+                  <option>keto</option>
+                </select>
+              </label>
+              <label>Food allergies (comma)
+                <input id="allergies" placeholder="peanuts, shellfish">
+              </label>
+              <label>Food dislikes / restrictions (comma)
+                <input id="food_dislikes" placeholder="no seafood, no dairy">
+              </label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                <label>Calories / day
+                  <input id="cal" type="number" value="2200" min="1200" max="4500">
+                </label>
+                <label>Sleep (hrs/night)
+                  <input id="sleep_hours" type="number" value="7" min="3" max="12">
+                </label>
+              </div>
+              <label>Stress level
+                <select id="stress_level">
+                  <option>low</option>
+                  <option selected>medium</option>
+                  <option>high</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- Motivation & Tracking -->
+            <div class="form" style="margin-top: 8px">
+              <div style="font-weight: 700; margin-bottom: 4px">Motivation & Tracking</div>
+              <label>Why now?
+                <select id="motivation">
+                  <option>personal health</option>
+                  <option>appearance / confidence</option>
+                  <option>performance / competition</option>
+                  <option selected>consistency & accountability</option>
+                </select>
+              </label>
+              <label>How to track progress?
+                <select id="tracking_pref">
+                  <option>scale weight</option>
+                  <option selected>strength PRs</option>
+                  <option>body measurements</option>
+                  <option>photos</option>
+                  <option>endurance metrics</option>
+                  <option>energy / mood</option>
+                </select>
+              </label>
+              <label>Accountability reminders
+                <select id="reminders">
+                  <option>none</option>
+                  <option selected>weekly summary</option>
+                  <option>daily nudges</option>
+                </select>
+              </label>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 6px" onclick="generatePlan()">Generate Plan</button>
           </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="page-pricing" style="display: none; margin-top: 14px">
+      <div class="card" style="margin-bottom: 12px">
+        <div style="font-weight: 800; font-size: 22px; margin-bottom: 4px">Plans designed to grow with you</div>
+        <div class="muted">Transparent. Cancel anytime.</div>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <h3>Starter</h3>
+          <div class="price">$0</div>
+          <div class="muted">Try Evolve.AI with basic features</div>
+          <ul>
+            <li class="check">AI weekly plan</li>
+            <li class="check">Recipe macros</li>
+            <li class="cross">No wearables</li>
+            <li class="cross">No coach chat</li>
+          </ul>
+          <button class="btn ghost" onclick="alert('Mock: Sign up flow')">Get started</button>
+        </div>
+        <div class="plan" style="border: 2px solid var(--accent)">
+          <h3>Pro</h3>
+          <div class="price">$9.99<span class="muted" style="font-size: 12px">/mo</span></div>
+          <div class="muted">Everything you need to stay consistent</div>
+          <ul>
+            <li class="check">Adaptive weekly plans</li>
+            <li class="check">Swap meals & workouts</li>
+            <li class="check">Wearable sync (coming)</li>
+            <li class="check">AI coach chat (beta)</li>
+          </ul>
+          <button class="btn" onclick="alert('Mock: Checkout')">Start free trial</button>
+        </div>
+        <div class="plan">
+          <h3>Coach</h3>
+          <div class="price">$39<span class="muted" style="font-size: 12px">/mo</span></div>
+          <div class="muted">For power users & athletes</div>
+          <ul>
+            <li class="check">Periodized programming</li>
+            <li class="check">Coach feedback</li>
+            <li class="check">Form video notes</li>
+          </ul>
+          <button class="btn" style="background: var(--accent2)" onclick="alert('Mock: Contact sales')">Talk to us</button>
         </div>
       </div>
     </section>
 
-    <!-- Profile Form -->
-    <section id="profile" class="section-card">
-      <h2 class="text-xl font-semibold mb-4 text-blue-400">Your Profile</h2>
-      <form id="userForm">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="form-control">
-            <label for="age">Age</label>
-            <input type="number" id="age" name="age" min="1" max="99" />
-          </div>
-          <div class="form-control">
-            <label for="sex">Sex</label>
-            <select id="sex" name="sex">
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label for="weight">Weight (lb)</label>
-            <input type="number" id="weight" name="weight" />
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="form-control">
-            <label for="heightFeet">Height — Feet</label>
-            <input type="number" id="heightFeet" name="heightFeet" />
-          </div>
-          <div class="form-control">
-            <label for="heightInches">Height — Inches</label>
-            <input type="number" id="heightInches" name="heightInches" />
-          </div>
-          <div class="form-control">
-            <label for="daysPerWeek">Days per week</label>
-            <input type="number" id="daysPerWeek" name="daysPerWeek" min="1" max="7" />
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control">
-            <label for="trainingPurpose">What are you training for?</label>
-            <select id="trainingPurpose" name="trainingPurpose">
-              <option value="general">General fitness</option>
-              <option value="weight_loss">Weight loss</option>
-              <option value="muscle_gain">Muscle gain</option>
-              <option value="performance">Performance</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label for="sports">Do you play any sports? (comma-separated)</label>
-            <input type="text" id="sports" name="sports" placeholder="e.g. soccer, basketball" />
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="form-control">
-            <label for="lifestyle">Lifestyle activity</label>
-            <select id="lifestyle" name="lifestyle">
-              <option value="sedentary">Sedentary</option>
-              <option value="light">Light</option>
-              <option value="moderate" selected>Moderate</option>
-              <option value="active">Active</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label for="preferredTime">Preferred training time</label>
-            <select id="preferredTime" name="preferredTime">
-              <option value="morning">Morning</option>
-              <option value="afternoon">Afternoon</option>
-              <option value="evening" selected>Evening</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label for="sessionLength">Session length (min)</label>
-            <input type="number" id="sessionLength" name="sessionLength" min="10" max="120" />
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control">
-            <label for="equipment">Equipment access</label>
-            <select id="equipment" name="equipment">
-              <option value="none">None</option>
-              <option value="home">Home gym</option>
-              <option value="full">Full gym</option>
-            </select>
-          </div>
-          <div class="form-control">
-            <label for="equipmentList">Equipment list (comma-separated)</label>
-            <input type="text" id="equipmentList" name="equipmentList" placeholder="e.g. dumbbells, barbell, bench" />
-          </div>
-        </div>
-      </form>
-    </section>
-
-    <!-- Buttons for API actions -->
-    <div class="flex flex-col md:flex-row md:justify-center gap-4 mb-8">
-      <button id="testPing" class="btn-primary w-full md:w-auto">Test Ping</button>
-      <button id="generatePlan" class="btn-primary w-full md:w-auto">Generate Plan</button>
-    </div>
-
-    <!-- Recent Activity & Debug Panels -->
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Recent Activity -->
-      <div class="section-card">
-        <h3 class="card-header">Recent Activity</h3>
-        <div id="activity" class="scroll-box">
-          <p class="italic text-gray-500">No recent activity yet.</p>
-        </div>
+    <!-- TRANSFORMATIONS -->
+    <section id="page-transformations" style="display: none; margin-top: 14px">
+      <div class="card" style="margin-bottom: 12px">
+        <div style="font-weight: 800; font-size: 22px; margin-bottom: 4px">Real change, measurable progress</div>
+        <div class="muted">Evolve.AI adapts to your life, equipment, and preferences.</div>
       </div>
-      <!-- Debug / JSON Panels -->
-      <div class="section-card">
-        <h3 class="card-header">Debug</h3>
-        <div id="debug" class="scroll-box">
-          <p class="italic text-gray-500">Debug output will appear here.</p>
+      <div class="gallery">
+        <div class="tile">
+          <div class="before">Before</div>
+          <div class="after" style="margin-top: 8px">After (8 wks)</div>
+          <div style="font-weight: 700; margin-top: 8px">Sarah —12&nbsp;lb</div>
+          <div class="muted">“Meals were easy to follow. Workouts scaled perfectly.”</div>
         </div>
-        <h3 class="card-header mt-6">Raw JSON</h3>
-        <div id="rawJSON" class="scroll-box">
-          <p class="italic text-gray-500">Raw JSON response will appear here.</p>
+        <div class="tile">
+          <div class="before">Before</div>
+          <div class="after" style="margin-top: 8px">After (10 wks)</div>
+          <div style="font-weight: 700; margin-top: 8px">Ryan +45&nbsp;lb DL</div>
+          <div class="muted">“Loved the strength focus + calorie targets.”</div>
+        </div>
+        <div class="tile">
+          <div class="before">Before</div>
+          <div class="after" style="margin-top: 8px">After (6 wks)</div>
+          <div style="font-weight: 700; margin-top: 8px">Priya —2” waist</div>
+          <div class="muted">“Felt personalized day one. Kept me consistent.”</div>
         </div>
       </div>
     </section>
-  </main>
+  </div>
 
-  <!-- Scripts -->
-  <script>
-    // API endpoints (update accordingly)
-    const API_BASE = "/.netlify/functions";
-    const TEST_API = API_BASE + "/testPing";
-    const PLAN_API = API_BASE + "/generatePlan";
-
-    // Helper to append logs
-    function addActivity(message) {
-      const activity = document.getElementById("activity");
-      const entry = document.createElement("p");
-      entry.textContent = "[" + new Date().toLocaleTimeString() + "] " + message;
-      activity.appendChild(entry);
-      activity.scrollTop = activity.scrollHeight;
+<script>
+  /* ---------------- Routing ---------------- */
+  const pages = {
+    '#/dashboard': 'page-dashboard',
+    '#/pricing': 'page-pricing',
+    '#/transformations': 'page-transformations'
+  };
+  function syncRoute() {
+    const h = location.hash || '#/dashboard';
+    for (const k in pages) {
+      document.getElementById(pages[k]).style.display = (k === h) ? 'block' : 'none';
     }
+    ['link-dashboard','link-pricing','link-transformations']
+      .forEach(id => document.getElementById(id)
+      .classList.toggle('active', ('#/' + id.split('-')[1]) === h));
+  }
+  window.addEventListener('hashchange', syncRoute);
 
-    // Update simple metrics (placeholder values can be changed in API response)
-    function updateMetrics(data) {
-      // Example fields: target_kcal, completed_sessions, total_sessions, weekly_summary
-      document.getElementById("calsRemaining").textContent =
-        data?.caloriesRemaining ?? "0";
-      document.getElementById("calsTarget").textContent =
-        data?.targetCalories ?? "0";
-      document.getElementById("workoutProgress").value =
-        data?.workoutCompletion ?? 0;
-      document.getElementById("workoutProgress").max = 1;
-      document.getElementById("workoutSessionsDone").textContent =
-        data?.sessionsDone ?? "0";
-      document.getElementById("workoutSessionsTotal").textContent =
-        data?.sessionsTotal ?? "0";
-      document.getElementById("weeklySummary").textContent =
-        data?.weeklySummary ?? "0 avg kcal · 0 workouts planned";
+  /* ---------------- Visuals ---------------- */
+  function donut(ctx, used, target) {
+    const w = ctx.canvas.width, h = ctx.canvas.height;
+    const r = Math.min(w, h) / 2 - 10, cx = w / 2, cy = h / 2;
+    const pct = Math.max(0, Math.min(1, used / target));
+    ctx.clearRect(0, 0, w, h);
+    ctx.lineWidth = 16;
+    ctx.strokeStyle = "#1f2937";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.strokeStyle = "#1f6feb";
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * pct);
+    ctx.stroke();
+    ctx.fillStyle = "#c9d1d9";
+    ctx.font = "600 18px Inter, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(Math.max(0, target - used) + " kcal", cx, cy);
+  }
+
+  /* ---------------- Helpers ---------------- */
+  function dlog() {
+    const el = document.getElementById('debugLog');
+    const line = [...arguments].map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+    el.textContent = (el.textContent ? el.textContent + '\n' : '') + line;
+  }
+  function ftInToCm(ft, inch) {
+    const total = (Number(ft) || 0) * 12 + (Number(inch) || 0);
+    return Math.round(total * 2.54);
+  }
+  function lbToKg(lb) {
+    return Math.round((Number(lb) || 0) * 0.453592 * 10) / 10;
+  }
+  function splitList(id) {
+    return (document.getElementById(id).value || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
+  // If HTML is on GitHub Pages, set your Netlify URL here; if site is on Netlify, leave as ''.
+  const NETLIFY_URL = '';
+
+  async function testPing() {
+    const endpoint = NETLIFY_URL ? NETLIFY_URL + '/.netlify/functions/ping' : '/.netlify/functions/ping';
+    dlog('Ping →', endpoint);
+    try {
+      const r = await fetch(endpoint);
+      dlog('Ping status:', r.status);
+      dlog('Ping body:', await r.text());
+    } catch (e) {
+      dlog('Ping error:', String(e));
     }
+  }
 
-    // Populate workout and meals
-    function renderPlan(plan) {
-      const workoutDiv = document.getElementById("todaysWorkout");
-      const mealsDiv = document.getElementById("todaysMeals");
+  /* -------- Normalize AI output to a stable shape -------- */
+  function pickPlanDay(data) {
+    if (!data || typeof data !== 'object') return { workouts: [], meals: [], focus: 'full', day: 1 };
+    let week = [];
+    if (Array.isArray(data.week)) week = data.week;
+    else if (data.week && Array.isArray(data.week.days)) week = data.week.days;
+    else if (data.plan && Array.isArray(data.plan.week)) week = data.plan.week;
+    if (!week.length && (data.workouts || data.meals)) {
+      return {
+        day: data.day || 1,
+        focus: data.focus || 'full',
+        workouts: Array.isArray(data.workouts) ? data.workouts : [],
+        meals: Array.isArray(data.meals) ? data.meals : []
+      };
+    }
+    if (!week.length) return { workouts: [], meals: [], focus: 'full', day: 1 };
+    const day = week.find(d => d.day === 1) ||
+                week.find(d => (d?.workouts?.length || 0) + (d?.meals?.length || 0) > 0) ||
+                week[0];
+    return {
+      day: typeof day.day === 'number' ? day.day : 1,
+      focus: day.focus || 'full',
+      workouts: Array.isArray(day.workouts) ? day.workouts : [],
+      meals: Array.isArray(day.meals) ? day.meals : []
+    };
+  }
 
-      // Clear existing items
-      workoutDiv.innerHTML = "";
-      mealsDiv.innerHTML = "";
+  /* ---------------- Generate Plan (calls Netlify Function) ---------------- */
+  async function generatePlan() {
+    const profile = {
+      age: Number(document.getElementById('age').value || 28),
+      sex: document.getElementById('sex').value,
+      height_cm: ftInToCm(document.getElementById('height_ft').value, document.getElementById('height_in').value),
+      weight_kg: lbToKg(document.getElementById('weight_lb').value),
+      training_for: document.getElementById('training_for').value,
+      goal: document.getElementById('training_for').value,
+      sports: splitList('sports'),
+      activity_level: document.getElementById('activity_level').value,
+      training_time: document.getElementById('training_time').value,
+      session_length: document.getElementById('session_length').value,
+      days_per_week: Number(document.getElementById('days').value || 5),
+      equipment_access: document.getElementById('equipment_access').value,
+      equipment: splitList('equip'),
+      injuries: splitList('injuries'),
+      medical: splitList('medical'),
+      diet_style: document.getElementById('diet').value,
+      allergies: splitList('allergies'),
+      food_dislikes: splitList('food_dislikes'),
+      calorie_target: Number(document.getElementById('cal').value || 2200),
+      sleep_hours: Number(document.getElementById('sleep_hours').value || 7),
+      stress_level: document.getElementById('stress_level').value,
+      motivation: document.getElementById('motivation').value,
+      tracking_pref: document.getElementById('tracking_pref').value,
+      reminders: document.getElementById('reminders').value
+    };
+
+    const endpoint = NETLIFY_URL ? NETLIFY_URL + '/.netlify/functions/generate-plan' : '/.netlify/functions/generate-plan';
+
+    dlog('Generate → POST', endpoint);
+    dlog('Profile:', profile);
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile)
+      });
+      const txt = await res.text();
+      dlog('Status:', res.status);
+      dlog('Raw response:', txt);
+
+      if (!res.ok) {
+        document.getElementById('planJson').textContent = `Error ${res.status}:\n` + txt;
+        alert('Server error. See Debug/JSON panels.');
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(txt);
+      } catch {
+        document.getElementById('planJson').textContent = 'Bad JSON from server:\n' + txt;
+        alert('Bad JSON from server.');
+        return;
+      }
+
+      const day1 = pickPlanDay(data);
 
       // Render workouts
-      if (plan && plan.workouts && plan.workouts.length > 0) {
-        plan.workouts.forEach((w) => {
-          const card = document.createElement("div");
-          card.className = "mb-4";
-          card.innerHTML =
-            "<p class='font-medium'>" +
-            w.name +
-            "</p><p class='text-sm text-gray-400'>" +
-            w.sets +
-            "</p>";
-          workoutDiv.appendChild(card);
-        });
+      if (!day1.workouts.length) {
+        document.getElementById('exerciseList').innerHTML =
+          `<div class="exercise"><div><div style="font-weight:600">No workouts returned</div><div class="muted">Check JSON panel for details.</div></div></div>`;
       } else {
-        workoutDiv.innerHTML =
-          "<p class='text-gray-500 italic'>No personalized workouts returned</p>";
+        document.getElementById('exerciseList').innerHTML = day1.workouts.map(x => {
+          const name = x.exercise || x.name || 'Exercise';
+          const sets = (typeof x.sets === 'number' || typeof x.sets === 'string') ? x.sets : '—';
+          const reps = x.reps || x.rep_range || '—';
+          const rest = x.rest_sec || x.rest || 60;
+          return `<div class='exercise'>
+            <div>
+              <div style='font-weight:600'>${name}</div>
+              <div class='muted'>${sets} × ${reps} • ${rest}s rest</div>
+            </div>
+            <button class='btn ghost' onclick='alert("Form cues coming soon")'>Demo</button>
+          </div>`;
+        }).join('');
       }
 
       // Render meals
-      if (plan && plan.meals && plan.meals.length > 0) {
-        plan.meals.forEach((m) => {
-          const card = document.createElement("div");
-          card.className = "mb-4";
-          card.innerHTML =
-            "<p class='font-medium'>" +
-            m.title +
-            "</p><p class='text-sm text-gray-400'>" +
-            m.calories +
-            " kcal</p>";
-          mealsDiv.appendChild(card);
-        });
+      if (!day1.meals.length) {
+        document.getElementById('mealGrid').innerHTML =
+          `<div class="meal"><div style="font-weight:600">No meals returned</div><div class="muted">Check JSON panel for details.</div></div>`;
       } else {
-        mealsDiv.innerHTML =
-          "<p class='text-gray-500 italic'>No personalized meals returned</p>";
+        document.getElementById('mealGrid').innerHTML = day1.meals.map(m => {
+          const name = m.name || 'Meal';
+          const kcal = m.kcal ?? m.calories ?? 0;
+          const p = m.protein_g ?? m.protein ?? 0;
+          const c = m.carbs_g ?? m.carbs ?? 0;
+          const f = m.fat_g ?? m.fat ?? 0;
+          const ing = Array.isArray(m.ingredients) ? m.ingredients : [];
+          const inst = Array.isArray(m.instructions) ? m.instructions : [];
+          return `<div class='meal'>
+            <div style='font-weight:600'>${name}</div>
+            <div class='muted'>${kcal} kcal • P:${p}g • C:${c}g • F:${f}g</div>
+            <details><summary>Recipe & macros</summary>
+              <ul>${ing.map(i => '<li>' + i + '</li>').join('')}</ul>
+              <ol>${inst.map(i => '<li>' + i + '</li>').join('')}</ol>
+            </details>
+          </div>`;
+        }).join('');
       }
+
+      // KPIs + meta
+      document.getElementById('workoutMeta').textContent =
+        `${day1.focus || 'training'} • ${profile.session_length}`;
+      document.getElementById('calTarget').textContent = profile.calorie_target;
+      document.getElementById('dietBadge').textContent =
+        profile.diet_style.replace(/\b\w/g, c => c.toUpperCase());
+      const used = Math.round((day1.meals || []).reduce((s, m) => s + (m.kcal ?? m.calories ?? 0), 0) * 0.75);
+      donut(document.getElementById('donut').getContext('2d'), used, profile.calorie_target);
+
+      // Progress mock + JSON + feed
+      const completed = Math.min(7, Math.floor(Math.random() * 5) + 2);
+      document.getElementById('progressBar').style.width = Math.round((completed / 7) * 100) + '%';
+      document.getElementById('progressText').textContent = `${completed} / 7 sessions`;
+      document.getElementById('weekSummary').textContent =
+        `${Math.round(profile.calorie_target * 0.98)} avg kcal · ${profile.days_per_week} workouts planned`;
+
+      document.getElementById('planJson').textContent = JSON.stringify({ profile, plan: data }, null, 2);
+      const row = document.createElement('div');
+      row.className = 'muted';
+      row.textContent = new Date().toLocaleTimeString() + ' — Rendered plan';
+      document.getElementById('feed').prepend(row);
+
+    } catch (e) {
+      dlog('Fetch error:', String(e));
+      document.getElementById('planJson').textContent = 'Fetch error:\n' + String(e);
+      alert('Network error. See Debug/JSON panels.');
     }
+  }
 
-    // Test Ping button
-    document.getElementById("testPing").addEventListener("click", async () => {
-      addActivity("Testing connection...");
-      try {
-        const res = await fetch(TEST_API);
-        const data = await res.json();
-        addActivity("Test response: " + JSON.stringify(data));
-      } catch (err) {
-        addActivity("Ping error: " + err.message);
-      }
-    });
-
-    // Generate Plan button
-    document
-      .getElementById("generatePlan")
-      .addEventListener("click", async () => {
-        addActivity("Generating personalized plan...");
-        const debugEl = document.getElementById("debug");
-        const rawEl = document.getElementById("rawJSON");
-        debugEl.textContent = "";
-        rawEl.textContent = "";
-
-        // Gather form data
-        const form = document.getElementById("userForm");
-        const formData = new FormData(form);
-        const payload = {};
-        formData.forEach((value, key) => {
-          payload[key] = value;
-        });
-
-        try {
-          const response = await fetch(PLAN_API, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-          const json = await response.json();
-          rawEl.textContent = JSON.stringify(json, null, 2);
-
-          if (json.error) {
-            debugEl.textContent = "Error: " + json.error;
-            addActivity("Plan generation failed.");
-          } else {
-            debugEl.textContent = "Plan generated successfully.";
-            updateMetrics(json.metrics);
-            renderPlan(json.plan);
-            addActivity("Plan generated.");
-          }
-        } catch (err) {
-          debugEl.textContent = "Network error: " + err.message;
-          addActivity("Network error.");
-        }
-      });
-  </script>
+  /* ---------------- First paint ---------------- */
+  (function init() {
+    syncRoute();
+    const ctx = document.getElementById('donut').getContext('2d');
+    donut(ctx, 1200, 2200);
+    document.getElementById('exerciseList').innerHTML =
+      '<div class="exercise"><div><div style="font-weight:600">Bench Press</div><div class="muted">4 × 6–8 • 90s rest</div></div><button class="btn ghost">Demo</button></div>';
+    document.getElementById('mealGrid').innerHTML =
+      '<div class="meal"><div style="font-weight:600">Breakfast</div><div class="muted">Press Generate to view personalized meals</div></div>';
+  })();
+</script>
 </body>
 </html>
