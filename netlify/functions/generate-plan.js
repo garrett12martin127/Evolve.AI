@@ -1,70 +1,43 @@
 // netlify/functions/generate-plan.js
-// JSON-mode, robust parsing, retry-on-bad-JSON. CommonJS for Netlify.
+// Chat Completions + JSON mode + safe fallback + test switch
 
-const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini'; 
-// Tip: if you want to try the other one, set OPENAI_MODEL in Netlify env to "gpt-5.1-mini" or similar.
+const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
 
 exports.handler = async (event) => {
-  // CORS preflight
+  // --- CORS ---
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
+    return { statusCode: 204, headers: cors(), body: '' };
   }
 
   try {
     if (event.httpMethod !== 'POST') {
-      return { statusCode: 405, body: JSON.stringify({ error: 'Use POST' }) };
+      return json(405, { error: 'Use POST' });
     }
 
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-    const body = JSON.parse(event.body || '{}');
+    const profile = JSON.parse(event.body || '{}');
 
-    // Fallback plan so UI shows something even without a key (helps diagnose plumbing)
-    if (!OPENAI_API_KEY) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'*' },
-        body: JSON.stringify({
-          week: [{
-            day: 1, focus: 'full',
-            workouts: [
-              { exercise:'Goblet Squat', sets:4, reps:'8-10', rest_sec:75 },
-              { exercise:'Push-Up', sets:4, reps:'AMRAP', rest_sec:60 },
-              { exercise:'DB Row', sets:3, reps:'10-12', rest_sec:60 },
-              { exercise:'RDL', sets:3, reps:'8-10', rest_sec:90 },
-              { exercise:'Plank', sets:3, reps:'45s', rest_sec:45 }
-            ],
-            meals: [
-              { name:'Omelet + Avocado', kcal:520, protein_g:32, carbs_g:18, fat_g:35,
-                ingredients:['eggs','avocado','spinach'],
-                instructions:['Whisk eggs','Cook with spinach','Top with avocado'] }
-            ]
-          }],
-          notes: 'Demo plan: add OPENAI_API_KEY in Netlify to enable live AI.'
-        })
-      };
+    // 1) No key? Always return a valid demo plan so UI renders
+    if (!OPENAI_API_KEY) return json(200, planFallback(profile, { reason: 'missing_api_key' }));
+
+    // 2) Test switch: append ?test=1 to URL to force a good JSON plan
+    const url = new URL(event.rawUrl || `https://x${event.path}`);
+    if (url.searchParams.get('test') === '1') {
+      return json(200, planFallback(profile, { reason: 'test_mode' }));
     }
 
-    const profile = body;
-
-    // Single source of truth for the prompt
+    // 3) Build prompts
     const systemPrompt = `
 You are Evolve.AI, an expert coach and sports nutritionist.
-Return ONLY a valid JSON object that matches this schema, with no extra text, no markdown fences:
+Reply ONLY with a single JSON object matching this schema. No extra text. No markdown.
+
 {
   "week": [
     {
       "day": 1-7,
       "focus": "upper|lower|full|recovery|conditioning|hypertrophy|power|mobility",
       "workouts": [
-        {"exercise":"...", "sets": number, "reps":"x-y or seconds", "rest_sec": number, "notes":"optional coaching cue"}
+        {"exercise":"...", "sets": number, "reps": "x-y or seconds", "rest_sec": number, "notes":"optional coaching cue"}
       ],
       "meals": [
         {"name":"...", "kcal": number, "protein_g": number, "carbs_g": number, "fat_g": number,
@@ -75,120 +48,114 @@ Return ONLY a valid JSON object that matches this schema, with no extra text, no
   "notes": "short overall guidance for the week (max 2 sentences)"
 }
 
-Programming rules:
-- Professional-grade training on training days: 6–7 movements; compounds first; match session_length and training_time.
-- Respect injuries/medical limits; suggest safe substitutions in "notes" per exercise if needed.
-- Match equipment_access and provided equipment list.
-- Reflect sports with appropriate movement selection/conditioning when relevant.
-- Balance the week across days_per_week; include at least one recovery/mobility/conditioning day if stress/sleep suggest it.
-- Meals must follow diet_style, avoid allergies/dislikes, and hit calorie_target ±10% with practical macros and concise instructions.
-`;
+Rules:
+- Training days: 6–7 movements; compounds first; honor session_length & training_time.
+- Respect injuries/medical; use safe substitutions in per-exercise "notes" if needed.
+- Match equipment_access & equipment list; reflect listed sports when relevant.
+- Balance across days_per_week; include recovery/mobility/conditioning if stress/sleep suggest.
+- Meals follow diet_style; avoid allergies/dislikes; hit calorie_target ±10% with practical macros.
+`.trim();
 
-    const userPrompt = {
-      role: "user",
-      content:
-        "User profile JSON:\n" +
-        JSON.stringify(profile, null, 2) +
-        "\n\nReturn ONLY the JSON object, no prose, no markdown."
-    };
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: 'User profile JSON:\n' + JSON.stringify(profile, null, 2) + '\nReturn ONLY the JSON object.' }
+    ];
 
-    async function callOpenAI() {
-      const resp = await fetch('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          // Many OpenAI models honor this structured JSON response format:
-          response_format: { type: "json_object" },
-          // Use the "input" (Responses API) with messages-style content:
-          input: [
-            { role: "system", content: systemPrompt },
-            userPrompt
-          ],
-          temperature: 0.7,
-          max_output_tokens: 3500
-        })
-      });
-      return resp.json();
-    }
+    // 4) Call OpenAI (JSON mode)
+    const out = await chatJSON(OPENAI_API_KEY, MODEL, messages, 0.6);
+    const parsed = tryParseJSON(out.text);
 
-    function tryParseJSON(text) {
-      try { return { ok: true, value: JSON.parse(text) }; }
-      catch {
-        // try to salvage the largest {...} block
-        const first = text.indexOf('{');
-        const last  = text.lastIndexOf('}');
-        if (first !== -1 && last !== -1 && last > first) {
-          const slice = text.slice(first, last + 1);
-          try { return { ok: true, value: JSON.parse(slice) }; } catch {}
-        }
-        return { ok: false, error: 'Invalid JSON', raw: text };
+    if (!parsed.ok) {
+      // Retry once a bit stricter
+      const out2 = await chatJSON(OPENAI_API_KEY, MODEL, [
+        { role: 'system', content: systemPrompt + '\nSTRICT: Reply must be only a single JSON object.' },
+        messages[1]
+      ], 0.4);
+      const parsed2 = tryParseJSON(out2.text);
+
+      if (!parsed2.ok) {
+        // Final: return a valid fallback so UI shows a plan, with error details in _meta
+        const fallback = planFallback(profile, { reason: 'bad_json', model: MODEL, raw: out2.text || out.text });
+        return json(200, fallback);
       }
+      parsed2.value._meta = { model: MODEL, retry: true };
+      return json(200, parsed2.value);
     }
 
-    // First attempt (JSON mode)
-    let data = await callOpenAI();
-    let text = data?.output_text || data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || '';
-
-    let parsed = tryParseJSON(text);
-
-    // If still bad, do one retry with a stricter instruction
-    if (!parsed.ok) {
-      const retry = await fetch('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: MODEL,
-          response_format: { type: "json_object" },
-          input: [
-            { role: "system", content: systemPrompt + "\nSTRICT MODE: Your entire reply MUST be a single JSON object, no leading/trailing text." },
-            userPrompt
-          ],
-          temperature: 0.4,
-          max_output_tokens: 3500
-        })
-      }).then(r => r.json());
-
-      text = retry?.output_text || retry?.choices?.[0]?.message?.content || retry?.choices?.[0]?.text || '';
-      parsed = tryParseJSON(text);
-    }
-
-    if (!parsed.ok) {
-      // Return a clear error + raw model text for debugging in your JSON panel
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'*' },
-        body: JSON.stringify({
-          error: 'Model did not return valid JSON after retry.',
-          hint: 'Check OPENAI_MODEL env or try a different model. You can also show this to the UI for debugging.',
-          raw: text
-        })
-      };
-    }
-
-    // Attach a tiny _meta for troubleshooting if you like
-    const plan = parsed.value;
-    plan._meta = {
-      model: MODEL,
-      calorie_target: profile.calorie_target,
-      days_per_week: profile.days_per_week,
-      diet_style: profile.diet_style
-    };
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'*' },
-      body: JSON.stringify(plan)
-    };
+    parsed.value._meta = { model: MODEL, retry: false };
+    return json(200, parsed.value);
 
   } catch (e) {
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'*' },
-      body: JSON.stringify({ error: String(e) })
-    };
+    // Return a valid plan even on unexpected errors
+    return json(200, planFallback({}, { reason: 'exception', error: String(e) }));
   }
 };
+
+/* ---------------- helpers ---------------- */
+function cors() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+}
+function json(code, obj) {
+  return { statusCode: code, headers: { 'Content-Type': 'application/json', ...cors() }, body: JSON.stringify(obj) };
+}
+async function chatJSON(key, model, messages, temperature) {
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      response_format: { type: 'json_object' },
+      messages,
+      temperature,
+      max_tokens: 3000
+    })
+  });
+  if (!r.ok) throw new Error(`OpenAI ${r.status}: ${await r.text()}`);
+  const data = await r.json();
+  const text = data?.choices?.[0]?.message?.content || '';
+  return { text, data };
+}
+function tryParseJSON(text) {
+  try { return { ok: true, value: JSON.parse(text) }; }
+  catch {
+    const first = text.indexOf('{'), last = text.lastIndexOf('}');
+    if (first !== -1 && last !== -1 && last > first) {
+      try { return { ok: true, value: JSON.parse(text.slice(first, last + 1)) }; } catch {}
+    }
+    return { ok: false, raw: text };
+  }
+}
+function planFallback(profile, meta = {}) {
+  const kcal = Number(profile?.calorie_target || 2200);
+  const diet = profile?.diet_style || 'balanced';
+  return {
+    week: [{
+      day: 1, focus: 'full',
+      workouts: [
+        { exercise:'Back Squat', sets:5, reps:'5',    rest_sec:120, notes:'Stay tight; neutral spine.' },
+        { exercise:'Bench Press', sets:5, reps:'5',   rest_sec:120, notes:'Shoulder blades retracted.' },
+        { exercise:'Romanian Deadlift', sets:3, reps:'8-10', rest_sec:90 },
+        { exercise:'DB Row', sets:3, reps:'10-12', rest_sec:75 },
+        { exercise:'Walking Lunge', sets:3, reps:'12/leg', rest_sec:60 },
+        { exercise:'Plank', sets:3, reps:'60s', rest_sec:45 }
+      ],
+      meals: [
+        { name:'Greek Yogurt Bowl', kcal: Math.round(kcal*0.25), protein_g:35, carbs_g:40, fat_g:10,
+          ingredients:['Greek yogurt','berries','honey','granola'],
+          instructions:['Mix yogurt + honey','Top with berries + granola'] },
+        { name:'Chicken Burrito Bowl', kcal: Math.round(kcal*0.40), protein_g:45, carbs_g:60, fat_g:18,
+          ingredients:['chicken','rice','black beans','corn','salsa','greens'],
+          instructions:['Cook chicken','Assemble bowl with rice/beans/veg'] },
+        { name:'Salmon + Veg + Quinoa', kcal: Math.round(kcal*0.35), protein_g:40, carbs_g:40, fat_g:20,
+          ingredients:['salmon','quinoa','broccoli','olive oil','lemon'],
+          instructions:['Bake salmon','Steam broccoli','Cook quinoa','Plate & drizzle oil + lemon'] }
+      ]
+    }],
+    notes: `Fallback plan • diet: ${diet} • target ~${kcal} kcal/day.`,
+    _meta: { fallback: true, ...meta }
+  };
+}
