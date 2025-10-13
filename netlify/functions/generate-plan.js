@@ -1,138 +1,156 @@
-// netlify/functions/generate-plan.js
-import fetch from "node-fetch";
+// /.netlify/functions/generate-plan.js
+//
+// This Netlify serverless function receives a POST request with a user profile
+// and calls the OpenAI API to generate a personalized weekly workout and meal plan.
+// It expects two environment variables to be set in Netlify’s settings:
+//   OPENAI_API_KEY  – your secret API key (looks like 'sk-...')
+//   OPENAI_MODEL    – the model name (e.g., 'gpt-4-turbo' or 'gpt-3.5-turbo')
+// You do not need to edit this file. Just deploy with your API key/model set.
 
-export const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Use POST" }) };
-  }
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-  // 1) Parse the user profile sent from index.html
-  let profile = {};
-  try { profile = JSON.parse(event.body || "{}"); }
-  catch { return { statusCode: 400, body: JSON.stringify({ error: "Bad JSON in request" }) }; }
-
-  // 2) Read secrets from Netlify (never put your key in the front-end)
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model  = process.env.OPENAI_MODEL || "gpt-4o-mini";
-  if (!apiKey) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Missing OPENAI_API_KEY" }) };
-  }
-
-  // 3) Strong instructions so the model creates unique, pro-grade plans
-  const systemPrompt = [
-    "You are Evolve.AI, a certified strength & conditioning coach and sports nutritionist.",
-    "Create a fresh 7-day plan from scratch based on the user's profile (goals, equipment, injuries).",
-    "Use A/B/C superset blocks with realistic sets, reps, rest, tempo, and coaching notes.",
-    "Meals must land within ±5% of the daily calorie target with reasonable macros.",
-    "Avoid repeating identical exercises across the week unless justified by the goal.",
-    "Return VALID JSON only, matching the schema. No extra commentary."
-  ].join("\n");
-
-  // 4) JSON schema that matches what index.html expects
-  const schema = {
-    type: "object",
-    properties: {
-      week: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            day: { type: "number" },
-            focus: { type: "string" },
-            blocks: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  block: { type: "string" }, // "A", "B", "C"
-                  items: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        code: { type: "string" },        // "A1", "A2"
-                        exercise: { type: "string" },
-                        sets: { type: "number" },
-                        reps: { type: "string" },        // "6–8"
-                        rest_sec: { type: "number" },    // 60, 90
-                        tempo: { type: "string" },       // "2-0-1"
-                        notes: { type: "string" }
-                      },
-                      required: ["code","exercise","sets","reps","rest_sec"]
-                    }
-                  }
-                },
-                required: ["block","items"]
-              }
-            },
-            meals: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  kcal: { type: "number" },
-                  protein_g: { type: "number" },
-                  carbs_g: { type: "number" },
-                  fat_g: { type: "number" },
-                  ingredients: { type: "array", items: { type: "string" } },
-                  instructions: { type: "array", items: { type: "string" } }
-                },
-                required: ["name","kcal"]
-              }
-            }
-          },
-          required: ["day","blocks","meals"]
-        }
-      }
-    },
-    required: ["week"]
-  };
-
-  // 5) Helper to call OpenAI with creative settings (variety) and structured JSON
-  async function callModel(temp=0.95) {
-    const body = {
-      model,
-      temperature: temp,            // ↑ more variety
-      top_p: 0.9,                   // keep coherent, still creative
-      response_format: { type: "json_schema", json_schema: { name: "PlanSchema", schema } },
-      messages: [
-        { role: "system", content: systemPrompt },
-        {
-          role: "user",
-          content:
-            "Generate a 7-day plan following the schema exactly. Tailor to this profile:\n" +
-            JSON.stringify(profile)
-        }
-      ]
+exports.handler = async function (event, context) {
+  // Only allow POST requests
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Use POST' })
     };
-
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    const out = await r.json();
-    if (!r.ok) throw new Error(out?.error?.message || "Model error");
-    const text = out?.choices?.[0]?.message?.content;
-    if (!text) throw new Error("Empty model response");
-    return JSON.parse(text); // guaranteed JSON due to response_format
   }
 
+  // Parse the incoming request body
+  let profile;
   try {
-    // First try: creative
-    let plan = await callModel(0.95);
-    // If you still see repeats, you can lightly shuffle items here or re-ask the model for a variant.
-
-    return { statusCode: 200, body: JSON.stringify(plan) };
-  } catch (e1) {
-    // Second try: more deterministic (safer)
-    try {
-      const plan = await callModel(0.6);
-      return { statusCode: 200, body: JSON.stringify(plan) };
-    } catch (e2) {
-      return { statusCode: 500, body: JSON.stringify({ error: e2.message || e1.message }) };
-    }
+    profile = JSON.parse(event.body);
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid JSON in request body', details: e.message })
+    };
   }
+
+  // Ensure required environment variables are present
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4-turbo';
+
+  if (!OPENAI_API_KEY) {
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Missing OPENAI_API_KEY environment variable' })
+    };
+  }
+
+  // Construct the prompt for the model.  You can adjust the wording
+  // here if you need different output formats, but the model will always
+  // return pure JSON in the final response.
+  const systemPrompt = `
+You are a professional strength coach and nutritionist AI. 
+Given a user profile, you produce a one-week plan with:
+- workouts: Supersetted A/B/C blocks with exercises, sets, reps, rest seconds, tempo, and optional notes.
+- meals: Balanced breakfast, lunch, dinner, and snacks with calories, macros, ingredients, and instructions.
+Return valid JSON. Do not wrap in code fences. The JSON format:
+{
+  "week": [
+    {
+      "day": 1,
+      "focus": "upper" | "lower" | "full" | "push" | "pull" | "cardio",
+      "blocks": [
+        {
+          "block": "A",
+          "items": [
+            {
+              "exercise": "Bench Press",
+              "sets": 4,
+              "reps": "6–8",
+              "rest_sec": 90,
+              "tempo": "2-1-1",
+              "notes": "Use 75% 1RM"
+            },
+            …
+          ]
+        },
+        …
+      ],
+      "meals": [
+        {
+          "name": "Breakfast",
+          "kcal": 500,
+          "protein_g": 35,
+          "carbs_g": 50,
+          "fat_g": 15,
+          "ingredients": ["egg whites", "oats", "banana"],
+          "instructions": ["Cook oats", "Add sliced banana", "Serve with scrambled egg whites"]
+        },
+        …
+      ]
+    },
+    …
+  ]
+}`;
+  const userPrompt = `User profile:\n${JSON.stringify(profile, null, 2)}\nPlease generate the JSON plan.`;
+
+  // Prepare the API call
+  const apiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt.trim() },
+        { role: 'user', content: userPrompt.trim() }
+      ],
+      temperature: 0.7,
+      max_tokens: 1800
+    })
+  });
+
+  // If OpenAI returns an error code, propagate it
+  const aiData = await apiResponse.json();
+  if (!apiResponse.ok) {
+    return {
+      statusCode: apiResponse.status,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: aiData.error || aiData })
+    };
+  }
+
+  // Extract and clean the assistant’s content
+  let content = aiData?.choices?.[0]?.message?.content || '';
+  content = content.trim();
+
+  // Strip code fences if present (the model may sometimes wrap JSON in ``` blocks)
+  if (content.startsWith('```')) {
+    content = content.replace(/^```json[\s\S]*?\n/, '').replace(/```$/, '');
+  }
+
+  // Attempt to parse the JSON from the response
+  let plan;
+  try {
+    plan = JSON.parse(content);
+  } catch (err) {
+    // If parsing fails, return a structured error with the raw content
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        error: 'Invalid JSON returned by model',
+        raw: content,
+        details: err.message
+      })
+    };
+  }
+
+  // Return the parsed plan
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(plan)
+  };
 };
