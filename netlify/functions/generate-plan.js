@@ -5,8 +5,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Use the model specified in the environment or default to gpt‑3.5‑turbo.
-const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
+// Use the model specified in the environment or default to gpt‑4o-mini.
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
 /**
  * Helper to extract JSON from within triple backticks or plain text
