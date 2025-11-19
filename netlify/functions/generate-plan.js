@@ -1,8 +1,11 @@
 const { OpenAI } = require('openai');
 
+// Initialize the OpenAI client using your API key from the Netlify env variables.
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Use the model specified in the environment or default to gpt‑3.5‑turbo.
 const MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
 
 /**
@@ -21,6 +24,7 @@ function parseJsonFromResponse(text) {
 }
 
 exports.handler = async (event) => {
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -28,6 +32,7 @@ exports.handler = async (event) => {
     };
   }
 
+  // Parse the incoming JSON payload
   let profile;
   try {
     profile = JSON.parse(event.body);
@@ -38,12 +43,38 @@ exports.handler = async (event) => {
     };
   }
 
+  // Destructure fields from the profile, providing defaults for arrays
   const {
-    age, sex, height_cm, weight_kg, weight_lb, protein_lb, training_for, sports,
-    activity_level, training_time, session_length, days_per_week, equipment_access,
-    equipment, injuries, medical, diet_style, allergies, food_dislikes,
-    calorie_target, sleep_hours, stress_level, motivation, tracking_pref, reminders
+    age,
+    sex,
+    height_cm,
+    weight_kg,
+    protein_per_lb,
+    training_for,
+    sports = [],
+    activity_level,
+    training_time,
+    session_length,
+    days_per_week,
+    equipment_access,
+    equipment = [],
+    injuries = [],
+    medical = [],
+    diet_style,
+    allergies = [],
+    food_dislikes = [],
+    calorie_target,
+    sleep_hours,
+    stress_level,
+    motivation,
+    tracking_pref,
+    reminders,
   } = profile;
+
+  // Convert weight to pounds for display, if provided
+  const weight_lb = weight_kg
+    ? parseFloat((weight_kg * 2.20462).toFixed(1))
+    : undefined;
 
   // Compose a detailed prompt for OpenAI
   const prompt = `
@@ -51,24 +82,24 @@ You are Evolve.AI, a world-class personal trainer and nutritionist. Based on the
 
 User profile:
 - Age: ${age}, Sex: ${sex}
-- Height: ${height_cm} cm, Weight: ${weight_kg} kg ( ${weight_lb} lb )
-- Protein target: ${protein_lb} grams per pound
+- Height: ${height_cm} cm, Weight: ${weight_kg} kg ( ${weight_lb ?? 'n/a'} lb )
+- Protein target: ${protein_per_lb} grams per pound
 - Goal: ${training_for}
-- Sports: ${sports.join(', ') || 'none'}
+- Sports: ${sports.length ? sports.join(', ') : 'none'}
 - Activity level: ${activity_level}
 - Preferred training time: ${training_time}, Session length: ${session_length}
 - Days per week training: ${days_per_week}
-- Equipment: ${equipment_access}; Available equipment: ${equipment.join(', ') || 'none'}
-- Injuries/limitations: ${injuries.join(', ') || 'none'}
-- Medical conditions: ${medical.join(', ') || 'none'}
-- Diet style: ${diet_style}, Allergies: ${allergies.join(', ') || 'none'}, Food dislikes: ${food_dislikes.join(', ') || 'none'}
+- Equipment: ${equipment_access}; Available equipment: ${equipment.length ? equipment.join(', ') : 'none'}
+- Injuries/limitations: ${injuries.length ? injuries.join(', ') : 'none'}
+- Medical conditions: ${medical.length ? medical.join(', ') : 'none'}
+- Diet style: ${diet_style}, Allergies: ${allergies.length ? allergies.join(', ') : 'none'}, Food dislikes: ${food_dislikes.length ? food_dislikes.join(', ') : 'none'}
 - Calorie target: ${calorie_target}
 - Sleep: ${sleep_hours} hours/night, Stress level: ${stress_level}
 - Motivation: ${motivation}, Tracking preference: ${tracking_pref}, Reminders: ${reminders}
 
 Requirements:
 1. Structure workouts into A/B/C blocks (supersets) for each day. Typically:
-   - Block A: one or two main lifts (e.g., compound movements).  
+   - Block A: one or two main lifts (e.g., compound movements).
    - Block B: accessory lifts.
    - Block C: mobility or stability work.
 2. Provide 3–5 sets per exercise with reps and rest intervals. Include a tempo if relevant.
@@ -119,10 +150,15 @@ Only include the JSON in the reply with no additional commentary.
 `;
 
   try {
+    // Call the OpenAI API to generate the plan
     const response = await openai.chat.completions.create({
       model: MODEL,
       messages: [
-        { role: 'system', content: 'You are a professional personal trainer and nutritionist delivering structured JSON plans.' },
+        {
+          role: 'system',
+          content:
+            'You are a professional personal trainer and nutritionist delivering structured JSON plans.',
+        },
         { role: 'user', content: prompt },
       ],
       temperature: 0.7,
@@ -132,11 +168,12 @@ Only include the JSON in the reply with no additional commentary.
       presence_penalty: 0,
     });
 
-    const message = response.choices[0].message?.content?.trim();
+    const message = response.choices[0]?.message?.content?.trim();
     if (!message) {
       throw new Error('No content from OpenAI response.');
     }
 
+    // Attempt to parse the JSON from the AI’s reply
     const plan = parseJsonFromResponse(message);
 
     return {
