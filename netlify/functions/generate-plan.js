@@ -1,11 +1,10 @@
 const { OpenAI } = require('openai');
 
-// Initialize the OpenAI client using your API key from the Netlify env variables.
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Use the model specified in the environment or default to gpt‑4o-mini.
+// IMPORTANT: this should NOT mention 3.5-turbo-0125 anywhere
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
 /**
@@ -152,21 +151,17 @@ Only include the JSON in the reply with no additional commentary.
   try {
     // Call the OpenAI API to generate the plan
     const response = await openai.chat.completions.create({
-      model: MODEL,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a professional personal trainer and nutritionist delivering structured JSON plans.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      max_tokens: 2500,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    });
+  model: MODEL,
+  messages: [
+    { role: 'system', content: 'You are a professional personal trainer and nutritionist delivering structured JSON plans.' },
+    { role: 'user', content: prompt },
+  ],
+  temperature: 0.7,
+  max_tokens: 2500,
+  top_p: 1,
+  frequency_penalty: 0,
+  presence_penalty: 0,
+});
 
     const message = response.choices[0]?.message?.content?.trim();
     if (!message) {
